@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="BENROLITS.css" />
+    <title>BENRO - LITS</title>
+   
+</head>
+<body>
+ <div class="app-wrapper">
+  <div class="header">
+    <img src="photos2/logopgb.png" alt="Logo" class="logo" />
+
+
+    
+    <div class="text-group">
+      <span class="title">BUKIDNON ENVIRONMENT AND NATURAL RESOURCES OFFICE</span>
+      <span class="subtitle">LEAVE INFORMATION TRACKING SYSTEM</span>
+    </div>
+  </div>
+
+
+  
+
+<div class="panel">
+  
+
+  <div class="dataentry" id="formPanel">
+    
+    <div class="floating-input-group1">
+  <input type="text" id="client" name="client" list="employeeList" placeholder=" " required autocomplete="off"/>
+<label for="client">EMPLOYEE NAME</label>
+
+<datalist id="employeeList"></datalist>
+
+<script src="loademployee.js"></script>
+
+</div>
+
+
+ <div class="floating-input-group11">
+  <input type="text" id="GENDER" list="gender" placeholder=" " required />
+  <label for="GENDER">GENDER</label>
+
+  <!-- Suggestion box for months -->
+  <datalist id="gender">
+    <option value="MALE">
+    <option value="FEMALE">
+   
+  </datalist>
+</div>
+
+
+
+
+ <div class="floating-input-group12">
+  <input
+    type="text"
+    id="TYPEOFDOCUMENT"
+    name="TYPEOFDOCUMENT"
+    list="TYPEOFDOCUMENT_LIST"
+    placeholder=" "
+    required
+  />
+  <label for="TYPEOFDOCUMENT">TYPE OF LEAVE</label>
+
+  <datalist id="TYPEOFDOCUMENT_LIST">
+    <option value="VACATION LEAVE">
+    <option value="MANDATORY/FORCED LEAVE">
+    <option value="SICK LEAVE">
+    <option value="MATERNITY LEAVE">
+    <option value="PATERNITY LEAVE">  
+      <option value="SPECIAL PRIVILEGE LEAVE"></option>
+    <option value="SPECIAL PRIVILEGE LEAVE (DOMESTIC LEAVE EMERGENCY)">
+    <option value="SOLO PARENT LEAVE">
+    <option value="STUDY LEAVE">
+    <option value="10-DAY VAWC LEAVE">
+    <option value="REHABILITATION PRIVILEGE">
+    <option value="SPECIAL LEAVE BENEFITS FOR WOMEN">
+    <option value="SPECIAL EMERGENCY (CALAMITY)">
+    <option value="ADOPTION LEAVE">
+
+          
+     </option>    
+    
+  </datalist>
+</div>
+
+
+<div class="floating-input-group2">
+  <input type="text" id="document" name="document" placeholder=" "required autocomplete="off"/>
+  <label for="document">IF SICK LEAVE PLEASE STATE THE ILLNESS</label>
+</div>
+
+
+
+
+
+<div class="floating-input-group14">
+  <input
+    type="text"
+    id="remarks"
+    name="remarks"
+    placeholder=" "
+    autocomplete="off"
+  />
+  <label for="remarks">REMARKS</label>
+</div>
+
+
+ <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+  />
+
+
+
+  <div class="picker-container">
+    <label class = "datelabel">SELECT DATE(S)</label>
+    <input type="text" id="multiDateTime" placeholder="Select dates..." />
+  </div>
+
+
+
+
+
+  <!-- Division Input -->
+  <div class="floating-input-group13" id="division-group">
+    <input type="text" id="division" name="division" list="divisionlist" placeholder=" " autocomplete="off"/>
+    <label for="division">DIVISION</label>
+
+    <datalist id="divisionlist">
+      <option value="AMD"></option>
+      <option value="MGMDD OFFICE"></option>
+      <option value="MGMDD - NORTH DISTRICT - 1A (Lingion, Manolo Fortich)"></option>
+      <option value="MGMDD - NORTH DISTRICT – 1B (San Vicente, Sumilao)"></option>
+      <option value="MGMDD - NORTH DISTRICT - 1C (Pualas, Baungon)"></option>
+      <option value="MGMDD - Central District Area – 1A  (Apo Macote, Malaybalay City)"></option>
+      <option value="MGMDD - CENTRAL  DISTRICT AREA – 1B (Sugod, Valencia City)"></option>
+      <option value="MGMDD - CENTRAL DISTRICT AREA – 1C  (Kahaponan, Valencia City)"></option>
+      <option value="SOUTH DISTRICT AREA FIELD (Calao - Calao, Don Carlos)"></option>
+      <option value="EMDD"></option>
+      <option value="ERDPPMD"></option>
+    </datalist>
+  </div>
+
+  
+
+
+
+<div class="datereleased">
+  <input
+    type="datetime-local"
+    id="dateReleased"
+    name="dateReleased"
+    placeholder=" "
+    required
+    autocomplete="off"
+  />
+  <label for="dateReleased">DATE CREATED</label>
+</div>
+
+
+
+
+<div class="BUTTONSS">
+
+
+
+<div class="form-buttons">
+  <button type="button" id="saveBtn" class="btn save">SAVE DATA</button>
+  <button class="btn cancel" id="cancelBtn">CLEAR</button>
+
+<button id="deleteBtn" class="btn delete" style="display:none;">DELETE</button>
+<button id="cancelEditBtn" class="btn cancel-edit" style="display:none;">CANCEL</button>
+
+<script>
+  clearAllFields();
+document.addEventListener("DOMContentLoaded", () => {
+
+  const cancelEditBtn = document.getElementById("cancelEditBtn");
+
+  if (!cancelEditBtn) return;
+
+  cancelEditBtn.addEventListener("click", async function (e) {
+
+    
+    e.preventDefault(); // prevents any form behavior
+
+    if (currentEditRowIndex === null) {
+      alert("No record selected.");
+      return;
+    }
+
+    if (!confirm("Mark this record as CANCELLED?")) return;
+
+    const now = new Date();
+
+    const formattedDate = now.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric"
+    }).toUpperCase();
+
+ const cancelHTML =
+`<span style="background:#d3d3d3;color:black;font-weight:bold;padding:2px 6px;border-radius:3px;">CANCELLED</span> - ${formattedDate}`;
+
+
+
+
+
+    const rows = document.querySelectorAll("#dataGrid tbody tr");
+    const row = rows[currentEditRowIndex - 2];
+
+    if (!row) {
+      alert("Row not found.");
+      return;
+    }
+
+    const remarksCell = row.cells[7];
+    const actionCell = row.cells[8];
+
+    const existingRemarks = remarksCell.innerHTML
+  .replace(/(<br>\s*)+$/g, "")
+  .trim();
+
+// 🚫 PREVENT DOUBLE CANCEL
+if (existingRemarks.toUpperCase().includes("CANCELLED")) {
+
+  document.getElementById("modalMessage").innerText = "This record is already CANCELLED.";
+  document.getElementById("modalNotification").style.display = "flex";
+
+  return; // stop execution
+}
+
+const finalRemarks = existingRemarks
+  ? existingRemarks + "<br>" + cancelHTML
+  : cancelHTML;
+    try {
+
+      await fetch(googleSheetsUrl, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          rowToUpdate: currentEditRowIndex,
+          action: "CANCEL",
+          dateStamp: finalRemarks,
+          isUpdateOnly: true
+        })
+      });
+
+      // Update UI only (does not touch form panel)
+      remarksCell.innerHTML = finalRemarks;
+
+      document.getElementById("modalMessage").innerText = "Record Cancelled";
+document.getElementById("modalNotification").style.display = "flex";
+
+      actionCell.innerHTML = `
+        <button disabled style="
+          background:#d3d3d3;
+          color:black;
+          font-weight:bold;
+          border:none;
+          padding:6px 10px;
+          border-radius:4px;
+        ">
+          CANCELLED
+        </button>
+      `;
+
+      row.style.opacity = "0.6";
+
+      // Exit edit mode safely
+      currentEditRowIndex = null;
+
+      const deleteBtn = document.getElementById("deleteBtn");
+      if (deleteBtn) deleteBtn.style.display = "none";
+
+      cancelEditBtn.style.display = "none";
+
+      if (typeof saveBtn !== "undefined") {
+        saveBtn.innerText = "SAVE DATA";
+        saveBtn.style.backgroundColor = "";
+      }
+
+    } catch (error) {
+      console.error("Cancel failed:", error);
+      alert("Cancel failed.");
+    }
+
+  });
+
+});
+
+
+
+
+function clearAllFields() {
+
+  // text inputs
+  document.getElementById("client").value = "";
+  document.getElementById("GENDER").value = "";
+  document.getElementById("TYPEOFDOCUMENT").value = "";
+  document.getElementById("document").value = "";
+  document.getElementById("division").value = "";
+  document.getElementById("remarks").value = "";
+
+  // datetime picker
+  document.getElementById("dateReleased").value = "";
+
+  // flatpickr multi date
+  if (typeof picker !== "undefined" && picker) {
+    picker.clear();
+  }
+
+}
+
+
+
+</script>  
+
+  
+
+</div>
+
+
+</div>
+
+  </div>
+
+
+
+
+
+<div id="toast">
+  <span class="toast-text">DATA SAVED!</span>
+  <span class="toast-check">&#10003;</span> <!-- Checkmark -->
+</div>
+
+
+
+
+
+
+
+
+<div class="search-container">
+  <input type="text" id="searchBox" placeholder="Search records...">
+<button id="searchBtn">Search</button> 
+ 
+</div>
+
+<div class="datatable">
+  <div class="table-container">
+    <table id="dataGrid">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>EMPLOYEES NAME</th>
+          <th>GENDER</th>
+          <th>TYPE OF LEAVE</th>
+          <th>DIVISION</th>
+          <th>DATE(S) LEAVE</th>
+          <th>DATE CREATED</th>
+          <th>REMARKS</th>
+          <th>ACTIONS</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Rows added dynamically via JS -->
+      </tbody>
+    </table>
+
+
+  </div>
+</div>
+
+<!-- Centered modal notification -->
+<div id="modalNotification" class="modal-notification">
+  <div class="modal-content">
+    <div class="status-icon">
+      <div class="spinner"></div>
+      <div class="checkmark">
+        <div class="check"></div>
+      </div>
+    </div>
+    <div id="modalMessage">Saving data...</div>
+    <button id="notificationOkBtn">OK</button>
+  </div>
+</div>
+
+
+<button id="toggleBtn" onclick="togglePanel()" class="btn-toggle">Hide Form</button>
+
+
+
+
+<button type="button" id="printBtn" class="btn-maroon">Print Form</button>
+
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+<script>
+// ===== EXCEL EXPORT WITH DIRECT SAVE DIALOGUE (NO MODAL) =====
+async function exportToExcel() {
+  const table = document.getElementById('dataGrid');
+  
+  if (!table) {
+    alert("Table not found!");
+    return;
+  }
+
+  try {
+    // 1. Prepare the data (Clone and remove ACTIONS column)
+    const clone = table.cloneNode(true);
+    const rows = clone.querySelectorAll('tr');
+    rows.forEach(row => {
+      if (row.cells.length > 0) row.deleteCell(-1);
+    });
+
+    // 2. Convert to Excel Workbook
+    const wb = XLSX.utils.table_to_book(clone, { sheet: "Leave Records" });
+    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
+    // 3. Open System Save Dialogue
+    if (window.showSaveFilePicker) {
+      const handle = await window.showSaveFilePicker({
+        suggestedName: 'BENRO_LEAVE_Records.xlsx',
+        types: [{
+          description: 'Excel Workbook',
+          accept: {'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx']},
+        }],
+      });
+      
+      const writable = await handle.createWritable();
+      await writable.write(blob);
+      await writable.close();
+      
+      alert("File saved successfully!"); 
+    } else {
+      // Fallback for browsers without Picker support (Firefox/Mobile)
+      XLSX.writeFile(wb, "BENRO_LEAVE_Records.xlsx");
+    }
+
+  } catch (err) {
+    // Silently handle user clicking "Cancel" in the dialog
+    if (err.name !== 'AbortError') {
+      console.error("Export failed:", err);
+      alert("An error occurred during export.");
+    }
+  }
+}
+
+// Connect button
+document.addEventListener('DOMContentLoaded', () => {
+    const printBtn = document.getElementById('printBtn');
+    if (printBtn) {
+        printBtn.addEventListener('click', exportToExcel);
+    }
+});
+</script>
+</div>
+  
+
+
+
+
+  
+</div>
+ <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="BENROLITS.js"></script> 
+
+
+<datalist id="employeeList"></datalist>
+
+<script src="loademployee.js"></script>
+
+<!-- 1. Include the SheetJS Library -->
+
+
+
+<div id="internetModal" style="
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.6);
+display:none;
+align-items:center;
+justify-content:center;
+z-index:9999;
+">
+
+<div style="
+background:white;
+padding:30px;
+border-radius:8px;
+text-align:center;
+font-size:18px;
+">
+
+📡 Internet Connection Lost<br><br>
+
+Attempting to reconnect...<br>
+Attempts: <span id="retryCount">0</span>
+
+</div>
+</div>
+
+</div>
+
+
+</body>
+</html>
+
+
+

@@ -1,0 +1,1746 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+
+  background-color: #78038d;
+  color: white;
+  padding: 7px 40px;
+  text-align: left;
+
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.logo {
+  height: 90px;
+  width: auto;
+  margin-right: 8px;
+}
+
+.text-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  font-size: 30px;  /* Large for main title */
+  font-weight: bold;
+}
+
+.subtitle {
+  font-size: 20px;  /* Smaller for subtitle */
+  font-weight: normal;
+  margin-top: 0px;
+}
+
+
+
+.panel {
+  border: 1px solid #000000;
+  border-radius: 10px;
+  padding: 20px;
+  width: 93%;
+  height: 5.5in;
+ 
+
+  /* Margins */
+  margin-top: 20px;    /* space above */
+  margin-right: 20px;  /* space to the right */
+  margin-bottom: 10px; /* space below */
+  margin-left: 30px;   /* space to the left */
+}
+
+.label1 {
+  font-size: 15px;  /* Large for main title */
+  font-weight: normal;
+  align-items: center;   
+  justify-content: center;
+   margin-left: 44%;
+}
+
+.dataentry {
+  border: 2px solid #ccc;     /* Border thickness & color */
+  border-radius: 20px;         /* Rounded corners */
+  padding: 20px;              /* Space inside */
+  background-color: white;    /* Panel background */
+  box-shadow: 0 2px 40px rgba(0,0,0,0.1); /* Optional shadow */
+  width: 96%;         /* Auto width based on content */
+  height: 42%;
+
+  margin-left: 5px;
+  margin-top: 3px;
+}
+
+.floating-input-group1 input[type="text"] {
+  width: 28%;
+  height: 27px;
+  font-size: 25px;
+  padding: 18px 12px 6px 12px;
+
+  textarea {
+  text-transform: uppercase;
+}
+
+
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  background-color: white;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.floating-input-group1 input[type="text"]:focus {
+  border-color:  #78038d;
+}
+
+.floating-input-group1 label {
+  position: absolute;
+  left: 12px;
+  top: 14px;
+  color: #888;
+  background-color: white;
+  padding: 0 4px;
+  font-size: 20px;
+  pointer-events: none;
+  transition: 0.2s ease all;
+}
+
+.floating-input-group1 input:focus + label,
+.floating-input-group1 input:not(:placeholder-shown) + label {
+  top: -8px;
+  font-size: 14px;
+  color:  #78038d;
+}
+
+.floating-input-group1 {
+  position: relative; /* Needed for label positioning */
+  margin-left: 18px;  /* Adjust left margin */
+  margin-top: 10px; /* Optional spacing between fields */
+}
+
+
+/*-------------------- GENDER -------------------------*/
+
+
+
+.floating-input-group11 input[type="text"] {
+  width: 20%;
+  height: 27px;
+  font-size: 25px;
+  padding: 18px 12px 6px 12px;
+
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  background-color: white;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.floating-input-group11 input[type="text"]:focus {
+  border-color: #78038d;
+}
+
+.floating-input-group11 label {
+  position: absolute;
+  left: 12px;
+  top: 14px;
+  color: #888;
+  background-color: white;
+  padding: 0 4px;
+  font-size: 20px;
+  pointer-events: none;
+  transition: 0.2s ease all;
+}
+
+.floating-input-group11 input:focus + label,
+.floating-input-group11 input:not(:placeholder-shown) + label {
+  top: -8px;
+  font-size: 14px;
+  color: #78038d;
+}
+
+.floating-input-group11 {
+  position: relative; /* Needed for label positioning */
+  margin-left: 32%;  /* Adjust left margin */
+  margin-top:  -53px;   /* Optional spacing between fields */
+}
+
+
+
+/*-------------------- TYPE OF DOCUMENT -------------------------*/
+
+
+
+
+.floating-input-group12 input[type="text"] {
+  width: 35%;
+  height: 27px;
+  font-size: 25px;
+  padding: 18px 12px 6px 12px;
+
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  background-color: white;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.floating-input-group12 input[type="text"]:focus {
+  border-color:  #78038d;
+}
+
+.floating-input-group12 label {
+  position: absolute;
+  left: 12px;
+  top: 14px;
+  color: #888;
+  background-color: white;
+  padding: 0 4px;
+  font-size: 20px;
+  pointer-events: none;
+  transition: 0.2s ease all;
+}
+
+.floating-input-group12 input:focus + label,
+.floating-input-group12 input:not(:placeholder-shown) + label {
+  top: -8px;
+  font-size: 14px;
+  color:  #78038d;
+}
+
+.floating-input-group12 {
+  position: relative; /* Needed for label positioning */
+  margin-left: 48.5%;  /* Adjust left margin */
+  margin-top:  -53px;   /* Optional spacing between fields */
+}
+
+
+
+
+/*-------------------- DOCUMENT -------------------------*/
+
+
+
+.floating-input-group2 input[type="text"] {
+  width: 90%;
+  height: 27px;
+  font-size: 25px;
+  padding: 18px 12px 6px 12px;
+
+
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  background-color: white;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.floating-input-group2 input[type="text"]:focus {
+  border-color:  #78038d;
+}
+
+.floating-input-group2 label {
+  position: absolute;
+  left: 12px;
+  top: 14px;
+  color: #888;
+  background-color: white;
+  padding: 0 4px;
+  font-size: 13px;
+  pointer-events: none;
+  transition: 0.2s ease all;
+}
+
+.floating-input-group2 input:focus + label,
+.floating-input-group2 input:not(:placeholder-shown) + label {
+  top: -8px;
+  font-size: 10px;
+  color:  #78038d;
+}
+
+.floating-input-group2 {
+  position: relative; /* Needed for label positioning */
+  margin-left: 69.5%;  /* Adjust left margin */
+  margin-top: -54px; /* Optional spacing between fields */
+}
+
+
+
+/*-------------------- DATE RECEIVED OD -------------------------*/
+
+
+
+.datereceivedod {
+  position: relative;
+  width: 290px;
+
+  margin-top: 29px;
+  margin-left: 17px;
+
+}
+
+/* Input base */
+.datereceivedod input {
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 14px;
+  border: 2px solid #d1d5db;
+  border-radius: 10px;
+  background-color: #fff;
+  color: #111;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+/* Hover effect */
+.datereceivedod:hover input {
+  border-color:  #78038d;
+  background-color: #f0f6ff;
+  box-shadow: 0 8px 18px  #450152(32, 226, 64, 0.25);
+  transform: translateY(-2px);
+}
+
+/* Focus */
+.datereceivedod input:focus {
+  outline: none;
+  border-color: #4CAF50;
+  box-shadow: 0 0 0 4px rgba(37, 235, 77, 0.2);
+}
+
+/* Floating label */
+.datereceivedod label {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 13px;
+  color: #6b7280;
+  background: #fff;
+  padding: 0 6px;
+  pointer-events: none;
+  transition: all 0.2s ease;
+}
+
+/* Move label when focused or has value */
+.datereceivedod input:focus + label,
+.datereceivedod input:not(:placeholder-shown) + label {
+  top: -8px;
+  left: 8px;
+  font-size: 11px;
+  color: #4CAF50;
+}
+
+
+
+
+/*-------------------- DATE ROUTED TO PENRO -------------------------*/
+
+
+
+
+
+.dateroutedpenro {
+  position: relative;
+  width: 290px;
+
+  margin-top: -50px;
+  margin-left: 350px;
+
+}
+
+/* Input base */
+.dateroutedpenro input {
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 14px;
+  border: 2px solid #d1d5db;
+  border-radius: 10px;
+  background-color: #fff;
+  color: #111;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+/* Hover effect */
+.dateroutedpenro:hover input {
+  border-color: #4CAF50;
+  background-color: #f0f6ff;
+  box-shadow: 0 8px 18px rgba(32, 226, 64, 0.25);
+  transform: translateY(-2px);
+}
+
+/* Focus */
+.dateroutedpenro input:focus {
+  outline: none;
+  border-color: #4CAF50;
+  box-shadow: 0 0 0 4px rgba(37, 235, 77, 0.2);
+}
+
+/* Floating label */
+.dateroutedpenro label {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 13px;
+  color: #6b7280;
+  background: #fff;
+  padding: 0 6px;
+  pointer-events: none;
+  transition: all 0.2s ease;
+}
+
+/* Move label when focused or has value */
+.dateroutedpenro input:focus + label,
+.dateroutedpenro input:not(:placeholder-shown) + label {
+  top: -8px;
+  left: 8px;
+  font-size: 11px;
+  color: #4CAF50;
+}
+
+
+
+/*-------------------- DATE RELEASED FROM PENRO -------------------------*/
+
+
+
+
+
+.datereleasedfrompenro {
+  position: relative;
+  width: 290px;
+
+  margin-top: -100px;
+  margin-left: 682px;
+
+}
+
+/* Input base */
+.datereleasedfrompenro input {
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 14px;
+  border: 2px solid #d1d5db;
+  border-radius: 10px;
+  background-color: #fff;
+  color: #111;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+/* Hover effect */
+.datereleasedfrompenro:hover input {
+  border-color: #4CAF50;
+  background-color: #f0f6ff;
+  box-shadow: 0 8px 18px rgba(32, 226, 64, 0.25);
+  transform: translateY(-2px);
+}
+
+/* Focus */
+.datereleasedfrompenro input:focus {
+  outline: none;
+  border-color: #4CAF50;
+  box-shadow: 0 0 0 4px rgba(37, 235, 77, 0.2);
+}
+
+
+/* Floating label */
+.datereleasedfrompenro label {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 13px;
+  color: #cf01c8;
+  background: #fff;
+  padding: 0 6px;
+  pointer-events: none;
+  transition: all 0.2s ease;
+}
+
+/* Move label when focused or has value */
+.datereleasedfrompenro input:focus + label,
+.datereleasedfrompenro input:not(:placeholder-shown) + label {
+  top: -8px;
+  left: 8px;
+  font-size: 11px;
+  color: #4CAF50;
+}
+
+
+
+
+
+/*-------------------- RELEASED TO DIVISION -------------------------*/
+
+
+
+
+.datereleased {
+  position: relative;
+  width: 290px;
+
+  margin-top: -49px;
+  margin-left: 63.5%;
+
+}
+
+/* Input base */
+.datereleased input {
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 14px;
+  border: 2px solid #d1d5db;
+  border-radius: 10px;
+  background-color: #fff;
+  color: #111;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+/* Hover effect */
+.datereleased:hover input {
+  border-color: #ab05a8;
+  background-color: #f0f6ff;
+  box-shadow: 0 8px 18px rgba(226, 32, 194, 0.25);
+  transform: translateY(-2px);
+}
+
+/* Focus */
+.datereleased input:focus {
+  outline: none;
+  border-color: #ab05a8;
+  box-shadow: 0 0 0 4px rgba(235, 37, 166, 0.2);
+}
+
+/* Floating label */
+.datereleased label {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 13px;
+  color: #6b7280;
+  background: #fff;
+  padding: 0 6px;
+  pointer-events: none;
+  transition: all 0.2s ease;
+}
+
+/* Move label when focused or has value */
+.datereleased input:focus + label,
+.datereleased input:not(:placeholder-shown) + label {
+  top: -8px;
+  left: 8px;
+  font-size: 11px;
+  color: #ab05a8;
+}
+
+
+
+
+/*-------------------- PERSONNEL RECEIVER -------------------------*/
+
+
+
+
+.floating-input-group14 input[type="text"] {
+  width: 28.1%;
+  height: 27px;
+  font-size: 25px;
+  padding: 18px 12px 6px 12px;
+
+
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  background-color: white;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.floating-input-group14 input[type="text"]:focus {
+  border-color: #78038d;
+}
+
+.floating-input-group14 label {
+  position: absolute;
+  left: 12px;
+  top: 14px;
+  color: #888;
+  background-color: white;
+  padding: 0 4px;
+  font-size: 20px;
+  pointer-events: none;
+  transition: 0.2s ease all;
+}
+
+.floating-input-group14 input:focus + label,
+.floating-input-group14 input:not(:placeholder-shown) + label {
+  top: -8px;
+  font-size: 14px;
+  color: #78038d;
+}
+
+.floating-input-group14 {
+  position: relative; /* Needed for label positioning */
+
+  margin-left: 18px;  /* Adjust left margin */
+  margin-top: 6%; /* Optional spacing between fields */
+}
+
+
+
+/*-------------------- FILE BROWSER -------------------------*/
+
+
+.floating-input-group.file-group {
+  position: relative;
+  margin-top: -53px;
+  margin-left: 730px;
+  width: 420px;
+  font-family: Arial, sans-serif;
+}
+
+.floating-input-group.file-group input[type="file"] {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid #d1d5db;
+  border-radius: 8px;
+  background-color: #fff;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.floating-input-group.file-group input[type="file"]:hover {
+  border-color: #4CAF50;
+  background-color: #f0f6ff;
+}
+
+.floating-input-group.file-group label {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 13px;
+  color: #6b7280;
+  background: #fff;
+  padding: 0 6px;
+  pointer-events: none;
+  transition: all 0.2s ease;
+}
+
+.floating-input-group.file-group input[type="file"]:focus + label,
+.floating-input-group.file-group input[type="file"]:not(:placeholder-shown) + label {
+  top: -8px;
+  font-size: 11px;
+  color: #4CAF50;
+}
+
+#fileList {
+  margin-top: 10px;
+  list-style: none;
+  padding-left: 0;
+}
+
+#fileList li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  margin-bottom: 5px;
+  background-color: #f9fafb;
+  font-size: 13px;
+}
+
+#fileList button {
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 2px 6px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.25s;
+}
+
+#fileList button:hover {
+  background-color: #b91c1c;
+}
+
+
+
+/*-------------------- SAVE DATA -------------------------*/
+
+
+.form-buttons {
+  display: flex;             
+  justify-content: flex-end; 
+  gap: 15px;                 
+  margin-top: 20px;
+  margin-right: 45px;
+}
+
+/* Common button styles */
+.btn {
+  padding: 10px 22px;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease; /* smooth animation for hover */
+}
+
+/* Save Button */
+.btn.save {
+  background-color: #3b82f6; /* Blue */
+}
+
+.btn.save:hover {
+  background-color: #2563eb; /* Darker blue */
+  transform: scale(1.05);    /* slight grow on hover */
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4); /* glow effect */
+}
+
+/* Cancel Button */
+.btn.cancel {
+  background-color: #a50404; /* Red */
+}
+
+.btn.cancel:hover {
+  background-color: #5f0202; /* Darker red */
+  transform: scale(1.05);    /* slight grow on hover */
+  box-shadow: 0 4px 15px rgba(175, 0, 0, 0.4); /* glow effect */
+}
+
+
+
+
+/*-------------------- DATA TABLE -------------------------*/
+
+.table-container {
+  width: 100%;
+  max-width: 200%;
+  margin: 20px auto;
+  overflow-x: auto; /* horizontal scroll if table is wide */
+  font-family: Arial, sans-serif;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 12px;
+  
+ 
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid #d1d5db;
+}
+
+th {
+  background-color:  #78038d;
+  color: white;
+  position: sticky;
+  top: 0; /* keeps header visible on vertical scroll */
+  z-index: 2;
+}
+
+tbody tr:hover {
+  background-color: #f0f6ff;
+}
+
+/* Action Buttons */
+button.action-btn {
+  padding: 4px 8px;
+  font-size: 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  color: white;
+  margin-right: 3px;
+  transition: all 0.3s ease; /* smooth hover animation */
+}
+
+/* Individual button colors with hover animations */
+button.openBtn {
+  background-color: #3b82f6;
+  color: white;
+}
+button.openBtn:hover {
+  background-color: #2563eb;
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.4);
+}
+
+button.edit-btn {
+  background-color: #10b981;
+  color: white;
+}
+button.edit-btn:hover {
+  background-color: #059669;
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(5, 150, 105, 0.4);
+}
+
+button.delete-btn {
+  background-color: #ef4444;
+  color: white;
+}
+button.delete-btn:hover {
+  background-color: #b91c1c;
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(185, 28, 28, 0.4);
+}
+
+button.send-btn {
+  background-color: #f59e0b;
+  color: white;
+}
+button.send-btn:hover {
+  background-color: #b45309;
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(180, 83, 9, 0.4);
+}
+
+/* Sticky right column for action buttons */
+table th:last-child,
+table td:last-child {
+  position: sticky;
+  right: 0;
+  background-color:  #78038d; /* match table body */
+  z-index: 1;
+}
+
+
+
+/*-------------------- ACTION BUTTONS -------------------------*/
+
+
+/* ===== ACTION BUTTONS STYLING ===== */
+.datatable button {
+  padding: 5px 12px;
+  margin: 2px;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+/* Specific colors for each button */
+
+.datatable .openBtn {
+  background-color: #0341f9; /* blue */
+  color: rgb(0, 0, 0);
+}
+
+
+
+.datatable .updateBtn {
+  background-color: #3498db; /* blue */
+  color: white;
+}
+
+.datatable .sendBtn {
+  background-color: #2ecc71; /* green */
+  color: white;
+}
+
+.datatable .deleteBtn {
+  background-color: #e74c3c; /* red */
+  color: white;
+}
+
+/* Hover effect */
+.datatable button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+/* Optional: small effect on click */
+.datatable button:active {
+  transform: scale(0.98);
+}
+
+/* Make table cells slightly bigger for buttons */
+.datatable td {
+  vertical-align: middle;
+}
+
+
+
+/* ===== DATAGRID CONTAINER ===== */
+.datatable {
+    width: 100%;
+    transition: all 0.5s ease-in-out;
+    height: 210px; /* Current size when form is visible */
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* This class will be added via JS when "Hide Form" is clicked */
+.datatable.expanded {
+    height: 700px; /* Adjust this value to fit exactly inside your panel's border */
+}
+
+.table-container {
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+#dataGrid {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#dataGrid th, #dataGrid td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+  white-space: nowrap; /* prevents text from wrapping */
+}
+
+/* Optional: header styling */
+#dataGrid thead {
+  background-color: #f5f5f5;
+  position: sticky;
+  top: 0; /* keeps header visible on vertical scroll */
+  z-index: 10;
+}
+
+/* Optional: zebra stripes for rows */
+#dataGrid tbody tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+
+
+
+.modal-notification {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 9999;
+}
+
+.modal-notification.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-content {
+  background: #333;
+  color: white;
+  padding: 40px 50px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  font-family: sans-serif;
+  font-size: 22px;
+  text-align: center;
+  min-width: 300px;
+}
+
+.status-icon {
+  position: relative;
+  width: 60px;
+  height: 60px;
+}
+
+.spinner {
+  width: 60px;
+  height: 60px;
+  border: 5px solid #fff;
+  border-top: 5px solid transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+}
+
+.check {
+  position: absolute;
+  margin-left: 30PX;
+  width: 25px;
+  height: 10px;
+  border-left: 4px solid white;
+  border-bottom: 4px solid white;
+  transform: rotate(-45deg) scale(0);
+  transform-origin: bottom left;
+  animation: checkAnim 0.4s forwards;
+}
+
+@keyframes checkAnim { to { transform: rotate(-45deg) scale(1); } }
+
+#notificationOkBtn {
+  padding: 10px 25px;
+  font-size: 18px;
+  border: none;
+  border-radius: 6px;
+  background: #4caf50;
+  color: white;
+  cursor: pointer;
+}
+
+#notificationOkBtn:hover {
+  background: #45a049;
+}
+
+
+
+
+
+
+
+
+/* Toast container */
+#toast {
+  visibility: hidden;
+  min-width: 220px;
+  max-width: 300px;
+  background-color: #ffffff;
+  color: #333;
+  text-align: left;
+  border: 2px solid #4CAF50; /* green border */
+  border-radius: 8px;
+  padding: 14px 20px;
+  position: fixed;
+  top: 20px;
+  left: -350px; /* start off-screen */
+  z-index: 1000;
+  font-family: 'Segoe UI', sans-serif;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  opacity: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  cursor: pointer;
+  transition: left 0.5s ease, opacity 0.5s, transform 0.3s, box-shadow 0.3s;
+}
+
+#toast.show {
+  visibility: visible;
+  opacity: 1;
+  left: 20px; /* slide in to visible position */
+}
+
+/* Hover effect */
+#toast:hover {
+  background-color: #f0fff0;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.35);
+  transform: translateX(5px);
+}
+
+/* Checkmark style */
+.toast-check {
+  font-size: 20px;
+  color: #78038d;
+  font-weight: bold;
+}
+
+
+
+
+.search-container {
+  position: relative;
+  width: 550px;
+  margin: 15px 0;
+  margin-top: 10px;
+  margin-left: 5px;
+}
+
+.search-container input {
+  width: 100%;
+  padding: 10px 40px 10px 14px;
+  border-radius: 25px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.search-container input:focus {
+  border-color: #78038d;
+  box-shadow: 0 0 6px #78038d(46, 125, 50, 0.3);
+}
+
+  
+/*DATE TIME PICKER FLATPICKR */
+
+
+
+  .picker-container {
+  width: 381px;
+  margin-left: 435px;
+  margin-top: -138px;
+  position: relative; /* make it a proper stacking context */
+  z-index: 2;        /* above overlapping elements */
+}
+
+
+ .picker-container input {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border-radius: 8px;
+  height: 28px;
+  cursor: pointer;      /* shows it’s clickable */
+  position: relative;   /* ensure click area is correct */
+  z-index: 3;           /* above the container */
+}
+
+  .datelabel{
+
+    font-size: 12px;
+    margin-left: 4px;
+    color: #78038d;
+    background-color: white;
+  }
+
+
+
+ .flatpickr-calendar {
+  z-index: 10000 !important;
+}
+
+
+/*-------------------- DIVISION -------------------------*/
+
+
+
+
+.floating-input-group13 input[type="text"] {
+  width: 27.90%;
+  height: 27px;
+  font-size: 25px;
+  padding: 18px 12px 6px 12px;
+
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  background-color: white;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.floating-input-group13 input[type="text"]:focus {
+  border-color: #78038d;
+}
+
+.floating-input-group13 label {
+  position: absolute;
+  left: 12px;
+  top: 14px;
+  color: #888;
+  background-color: white;
+  padding: 0 4px;
+  font-size: 20px;
+  pointer-events: none;
+  transition: 0.2s ease all;
+}
+
+.floating-input-group13 input:focus + label,
+.floating-input-group13 input:not(:placeholder-shown) + label {
+  top: -8px;
+  font-size: 14px;
+  color: #78038d;
+}
+
+.floating-input-group13 {
+  position: relative; /* Needed for label positioning */
+  margin-left: 1.3%;  /* Adjust left margin */
+  margin-top:  -55px;   /* Optional spacing between fields */
+}
+
+
+
+
+/* Floating Input Group 16 */
+.floating-input-group16 {
+  position: relative; /* normal flow */
+  margin-top: 10px;  /* spacing from division field */
+  margin-left: 20px;
+  width: 350px;      /* adjust width as needed */
+}
+
+/* Hidden class to hide subfield */
+.floating-input-group16.hidden {
+  display: none;
+}
+
+/* Input box styling */
+.floating-input-group16 input {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  outline: none;
+  background-color: white;
+}
+
+/* Floating label */
+.floating-input-group16 label {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  color: #888;
+  background-color: white;
+  padding: 0 4px;
+  pointer-events: none;
+  transition: 0.2s ease all;
+}
+
+/* Label floats when input has value or is focused */
+.floating-input-group16 input:focus + label,
+.floating-input-group16 input:not(:placeholder-shown) + label {
+  top: -8px;
+  font-size: 12px;
+  color: #78038d;
+}
+
+
+.BUTTONSS{
+  margin-top: 2%;
+}
+
+
+.form-buttons {
+  position: relative;
+  z-index: 20000;
+
+}
+
+
+.modal-notification {
+  pointer-events: none;
+}
+
+.modal-notification.show {
+  pointer-events: auto;
+}
+
+
+
+.flatpickr-calendar {
+  pointer-events: auto;
+}
+
+.flatpickr-calendar.hidden {
+  pointer-events: none;
+}
+
+
+/* Spinner */
+.spinner {
+  width: 60px;
+  height: 60px;
+  border: 5px solid #fff;
+  border-top: 5px solid transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Checkmark animation */
+.check {
+  width: 25px;
+  height: 10px;
+  border-left: 4px solid white;
+  border-bottom: 4px solid white;
+  transform: rotate(-45deg) scale(0);
+  transform-origin: bottom left;
+}
+
+@keyframes checkAnim {
+  to { transform: rotate(-45deg) scale(1); }
+}
+
+
+
+.floating-input-group14 {
+  visibility: hidden;
+}
+
+
+/* Container to keep them on one line */
+.search-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;           /* Space between box and button */
+  margin-bottom: 20px;
+}
+
+/* Style the Search Box */
+
+
+/* Style the Search Button */
+#searchBtn {
+  padding: 10px 25px;
+  background-color: #007bff; /* Vibrant Blue */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s ease;
+}
+
+#searchBtn:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}
+
+
+
+
+/* Style for the Toggle Button */
+.btn-toggle {
+  padding: 10px 20px;
+  background-color: #6c757d; /* Grey color to distinguish from Search */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-left: 10px;
+  font-weight: 600;
+}
+
+/* The class that hides the form */
+.hidden {
+  display: none !important;
+}
+
+/* Ensure the data grid container expands */
+#dataGridContainer {
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+
+
+#formPanel {
+  max-height: 200px; /* High enough to fit your form */
+  overflow: hidden;
+  transition: max-height 0.5s ease-in-out, opacity 0.5s ease, margin-buttom 0.5s ease;
+  opacity: 1;
+}
+
+/* State when hidden */
+#formPanel.hidden-panel {
+  max-height: 0;
+  opacity: 0;
+  margin-bottom: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  pointer-events: none;
+}
+
+
+
+
+/* Optional Toggle Button Styling */
+.btn-toggle {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 10px;
+  transition: 0.3s;
+}
+
+.btn-toggle.active {
+  background-color: #28a745; /* Green when showing "Show Form" */
+}
+
+
+
+.btn-toggle{
+
+  margin-left: 90%;
+  margin-top: 22px;
+}
+
+
+
+
+.container-class {
+  height: auto; /* Allows border to shrink when content is hidden */
+  border: 2px solid;
+}
+
+
+
+/* The white box holding everything */
+.main-wrapper {
+  height: 600px; /* Set a fixed height that fits everything comfortably */
+  position: relative; 
+  padding-bottom: 60px; /* Space for the button at the bottom */
+}
+
+/* Ensure the button stays at the bottom of the fixed-height wrapper */
+#toggleBtn {
+  position: absolute;
+  bottom: 6px;
+  right: 50px;
+}
+
+
+
+/* 1. DEFAULT STATE: Column is Visible */
+.datatable th:last-child,
+.datatable td:last-child {
+  opacity: 1;
+  max-width: 120px; /* Adjust to fit your action buttons */
+  width: 150px;
+  padding: 10px;
+  overflow: hidden;
+  white-space: nowrap;
+  /* Sync with your 0.8s form transition */
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  border-left: 1px solid #eee;
+}
+
+/* 2. HIDDEN STATE: Column Slides and Fades Out */
+.hide-actions th:last-child,
+.hide-actions td:last-child {
+  max-width: 0;
+  width: 0;
+  padding-left: 0;
+  padding-right: 0;
+  opacity: 0;
+  border-left: 0px solid transparent;
+  pointer-events: none; /* Prevents clicking invisible buttons */
+}
+
+
+/* Normal Button Style */
+.btn-maroon {
+  background-color: #800000;
+  color: #FFFFFF;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-left: 10px;
+  transition: background-color 0.2s;
+}
+
+.btn-maroon:hover {
+  background-color: #a00000; /* Lighter maroon on hover */
+}
+
+/* Hide the button when printing */
+@media print {
+  /* Hide everything you DON'T want on paper */
+  #sidebar, .search-container, #saveBtn, #printBtn, .nav-menu {
+    display: none !important;
+  }
+  
+  /* Ensure the form takes up the full page width */
+  .form-container {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+  }
+}
+
+
+
+/* Base Style for your Print Button */
+.btn-maroon {
+  background-color: #800000; /* Maroon */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease; /* Makes the hover smooth */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Hover Effect */
+.btn-maroon:hover {
+  background-color: #a00000; /* Lighter maroon */
+  transform: translateY(-2px); /* Lifts the button up slightly */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* Deeper shadow */
+}
+
+/* Active (Click) Effect */
+.btn-maroon:active {
+  transform: translateY(0); /* Pushes it back down when clicked */
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+/* Ensure the button never shows up on the actual printed paper */
+@media print {
+  #printBtn { display: none !important; }
+}
+
+
+#printBtn {
+  display: none;
+}
+
+
+@page {
+  size: landscape;
+}
+
+
+
+#printBtn {
+    position: relative;
+    z-index: 9999;
+}
+
+
+
+
+
+@media print {
+  /* Hide buttons during print */
+  #saveBtn, #printBtn, .hide-form-button {
+    display: none !important;
+  }
+  
+  /* Force the form to be visible even if it was 'hidden' in the UI */
+  .form-container {
+    display: block !important;
+    visibility: visible !important;
+  }
+}
+
+
+.emp-link {
+    text-decoration: none; /* No underline */
+    color: #800000;        /* Maroon clickable color */
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.emp-link:hover {
+    text-decoration: underline; /* Shows underline only on hover */
+    color: #500000;
+}
+
+
+
+/* DELETE BUTTON */
+#deleteBtn {
+  background-color: black;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 18px;
+  font-weight: bold;
+  transition: all 0.25s ease;
+}
+
+/* DELETE HOVER */
+#deleteBtn:hover {
+  background-color: #222;
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+  cursor: pointer;
+}
+
+
+/* CANCEL BUTTON */
+#cancelEditBtn {
+  background-color: #d3d3d3;
+  color: black;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 18px;
+  font-weight: bold;
+  transition: all 0.25s ease;
+}
+
+/* CANCEL HOVER */
+#cancelEditBtn:hover {
+  background-color: #bfbfbf;
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.25);
+  cursor: pointer;
+}
+
+
+
+#deleteBtn {
+  display: none !important;
+}
+
+
+
+
+
+
+
+
+
+
+
+.name-suggestions{
+  position:absolute;
+  background:white;
+  border:1px solid #ccc;
+  width:100%;
+  max-height:180px;
+  overflow-y:auto;
+  z-index:9999;
+  display:none;
+}
+
+.suggestion-item{
+  padding:8px;
+  cursor:pointer;
+}
+
+.suggestion-item:hover{
+  background:#f1f1f1;
+}
+
+
+
+
+
+
+
+.internet-modal{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.5);
+display:none;
+align-items:center;
+justify-content:center;
+z-index:99999;
+}
+
+.internet-box{
+background:white;
+padding:35px;
+border-radius:12px;
+text-align:center;
+width:320px;
+box-shadow:0 0 20px rgba(0,0,0,0.3);
+font-family:Arial;
+}
+
+.internet-icon{
+font-size:60px;
+margin-bottom:10px;
+}
+
+.spinner{
+width:40px;
+height:40px;
+border:5px solid #eee;
+border-top:5px solid #d93025;
+border-radius:50%;
+margin:15px auto;
+animation:spin 1s linear infinite;
+}
+
+@keyframes spin{
+0%{transform:rotate(0deg)}
+100%{transform:rotate(360deg)}
+}
+
+
+
+
+
+
+
+@media (max-width:1024px){
+
+.panel{
+width:98%;
+}
+
+}
+
+
+
+
+
+body{
+overflow-x:auto;
+}
+
+
+
+
+html, body{
+    min-width:1400px;
+}
+
+.app-wrapper{
+    width:1600px;
+    margin:auto;
+}
+
+body{
+    overflow-x:auto;
+}
+
+
+.app-wrapper{
+width:1528px;
+margin:auto;
+}
+
+body{
+overflow-x:auto;
+}
