@@ -515,30 +515,27 @@ if (rawLeaveDates && rawLeaveDates !== "-") {
     const rawRemarks = (d["REMARKS"] || "").toString().toUpperCase();
     const displayRemarks = rawRemarks.split('\n').join('<br>');
 
-    let btnHtml = "";
- if (rawRemarks.includes("CANCELLED")) {
+  const hasCancelled = rawRemarks.includes("CANCELLED");
+const hasReceived = rawRemarks.includes("RECEIVED");
+const hasSubmitted = rawRemarks.includes("SUBMITTED");
 
+let btnHtml = "";
+
+if (hasCancelled) {
   btnHtml = `<button class="done-btn" disabled>CANCELLED</button>`;
-
-} 
-else if (rawRemarks.includes("RECEIVED")) {
-
+}
+else if (hasReceived) {
   btnHtml = `<button class="done-btn" disabled>COMPLETED</button>`;
-
-} 
-else if (rawRemarks.includes("SUBMITTED")) {
-
+}
+else if (hasSubmitted) {
   btnHtml = `
     <button class="receive-btn" onclick="handleSubmit(${d.rowIndex}, event)">RECEIVED</button>
   `;
-
-} 
+}
 else {
-
   btnHtml = `
     <button class="submit-btn" onclick="handleSubmit(${d.rowIndex}, event)">SUBMIT</button>
   `;
-
 }
     // --- UPDATED ROW HTML WITH CLICKABLE NAME ---
     const empName = (d["EMPLOYEE NAME"] || d["EMPLOYEE NAME "] || "-").replace(/'/g, "\\'");
@@ -640,7 +637,9 @@ async function handleSubmit(sheetRowIndex, event) {
 });
 
     // Update UI immediately
-    remarksCell.innerHTML = htmlToSave;
+    remarksCell.innerHTML = existingRemarks
+  ? existingRemarks + "<br>" + htmlToSave
+  : htmlToSave;
 
     const recordIndex = sheetRowIndex - 2;
     if (allRecords[recordIndex]) {
@@ -1014,83 +1013,110 @@ function togglePanel() {
 const cancelBtn = document.getElementById("cancelBtn");
 
 
-cancelBtn.addEventListener("click", () => {
-    // 1. Reset the Edit Mode tracker
-    currentEditRowIndex = null;
-    clearLeaveHours(); // ✅ ADD
-    
+cancelEditBtn.addEventListener("click", async function (e) {
 
-    // 2. Revert the Save Button UI
-    const saveBtn = document.getElementById("saveBtn");
-    saveBtn.innerText = "SAVE DATA";
-    saveBtn.style.backgroundColor = ""; // Resets to your original CSS color (maroon/blue)
+  e.preventDefault();
 
-     // HIDE DELETE & CANCEL BUTTONS
-    document.getElementById("deleteBtn").style.display = "none";
-    document.getElementById("cancelEditBtn").style.display = "none";
+  if (currentEditRowIndex === null) {
+    alert("No record selected.");
+    return;
+  }
 
+  if (!confirm("Mark this record as CANCELLED?")) return;
 
-    // 3. Clear the Flatpickr calendar
-    if (typeof picker !== 'undefined' && picker !== null) {
-        picker.clear();
-    }
+  const now = new Date();
 
-    // 4. Reset the Sick Leave illness input
-    const illnessInput = document.getElementById("document");
-    if (illnessInput) {
-        illnessInput.disabled = true;
-        illnessInput.value = "";
-        illnessInput.style.backgroundColor = "#f0f0f0";
-    }
+  const formattedDate = now.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric"
+  }).toUpperCase();
 
-    // 5. Clear all form fields (optional but recommended)
-    // document.getElementById("formPanel").reset(); 
-    
-    console.log("Form reset to SAVE mode");
-});
+  const formattedTime = now.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true
+  }).toUpperCase().replace(/\s+/g, "");
 
-if (cancelBtn) {
-  cancelBtn.addEventListener("click", (e) => {
-    e.preventDefault(); // Stop the page from refreshing
-    clearLeaveHours(); // ✅ ADD
+  const cancelHTML = `
+<span style="background:#d3d3d3;color:black;font-weight:bold;padding:2px 6px;border-radius:3px;">
+CANCELLED
+</span> - ${formattedDate} - ${formattedTime}
+`;
 
-    if (!confirm("Clear all fields?")) return;
-clearLeaveHours(); // ✅ ADD
-    // 1. Reset Text Inputs
-    const textFields = ["client", "division", "dateReleased", "document", "mgmd-sub", "GENDER", "TYPEOFDOCUMENT"];
-    textFields.forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.value = "";
-      document.getElementById("cancelBtn").addEventListener("click", () => {
-    currentEditRowIndex = null;
-    saveBtn.innerText = "SAVE DATA";
-    saveBtn.style.backgroundColor = ""; 
-    if (picker) picker.clear();
+  const rows = document.querySelectorAll("#dataGrid tbody tr");
+  const row = rows[currentEditRowIndex - 2];
 
-    
-});
+  if (!row) {
+    alert("Row not found.");
+    return;
+  }
+
+  // ✅ FIXED COLUMN INDEXES (NO SIDE EFFECT)
+  const remarksCell = row.cells[8];
+  const actionCell = row.cells[9];
+
+  // ===== SAFE PATCH (DO NOT BREAK EXISTING LOGIC) =====
+  let existingRemarks = remarksCell.innerHTML.trim();
+
+  // remove trailing <br>
+  existingRemarks = existingRemarks.replace(/(<br>\s*)+$/g, "").trim();
+
+  // remove ONLY old CANCELLED (keep SUBMITTED + RECEIVED)
+  existingRemarks = existingRemarks.replace(/<span[^>]*>CANCELLED<\/span>.*$/i, "").trim();
+
+  // append instead of overwrite
+  const finalRemarks = existingRemarks
+    ? existingRemarks + "<br>" + cancelHTML
+    : cancelHTML;
+
+  try {
+
+    await fetch(googleSheetsUrl, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain" },
+      body: JSON.stringify({
+        rowToUpdate: currentEditRowIndex,
+        action: "CANCEL",
+        dateStamp: finalRemarks,
+        isUpdateOnly: true
+      })
     });
 
-    
+    // ✅ update UI without breaking history
+    remarksCell.innerHTML = finalRemarks;
 
-    // 3. Clear Flatpickr (Multiple Date Picker)
-    if (typeof picker !== 'undefined' && picker !== null) {
-      picker.clear(); 
+    actionCell.innerHTML = `
+      <button disabled style="
+        background:#d3d3d3;
+        color:black;
+        font-weight:bold;
+        border:none;
+        padding:6px 10px;
+        border-radius:4px;">
+        CANCELLED
+      </button>
+    `;
+
+    row.style.opacity = "0.6";
+
+    currentEditRowIndex = null;
+
+    document.getElementById("deleteBtn").style.display = "none";
+    cancelEditBtn.style.display = "none";
+
+    if (typeof saveBtn !== "undefined") {
+      saveBtn.innerText = "SAVE DATA";
+      saveBtn.style.backgroundColor = "";
     }
 
-    // 4. Force Reset Sick Leave Field UI
-    if (illnessInput) {
-      illnessInput.disabled = true;
-      illnessInput.style.backgroundColor = "#f0f0f0";
-      illnessInput.value = "";
-    }
+  } catch (error) {
+    console.error("Cancel failed:", error);
+    alert("Cancel failed.");
+  }
 
-
-    console.log("Form reset successfully.");
-  });
-}
-
-
+});
 
 
 
