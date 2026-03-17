@@ -1,5 +1,5 @@
 // ===== CONFIG =====
-const googleSheetsUrl = "https://script.google.com/macros/s/AKfycbwpNM-j20xXFS-N3a-JtZXhFSfy1h7OICg-VZsK_8JP8FHuwj6Me_gHpTDeN8qSVRE/exec";
+const googleSheetsUrl = "https://script.google.com/macros/s/AKfycbxAud1hQXdNVhSlDsh56QCp0pVH5t_R_BYxNsT3035dK5NjeYIrws1WhX-QARNQ9e1N/exec";
 const employeeListUrl = "https://script.google.com/macros/s/AKfycbz45A4WQebeP0l1HXGmb-372xqnJI_PzSAsnBrdPT__CEolhzerDVDrM5gTRNmSpe-c/exec";
 
 
@@ -124,8 +124,16 @@ function collectFormData() {
   const type = document.getElementById("TYPEOFDOCUMENT")?.value.trim() || "";
   const illness = document.getElementById("document")?.value.trim() || "";
   const division = document.getElementById("division")?.value.trim() || "";
-  const dateReleased = document.getElementById("dateReleased")?.value.trim() || "";
   const mgmdSub = document.getElementById("mgmd-sub")?.value.trim() || "";
+
+  // ✅ FIX 1: DEFINE leaveHours HERE
+  const leaveHours = document.getElementById("leavehours")?.value.trim() || "";
+
+  // ✅ FIX 2: AUTO DATE CREATED
+  let dateReleased = document.getElementById("dateReleased")?.value.trim();
+  if (!dateReleased) {
+    dateReleased = new Date().toISOString();
+  }
 
   const unique = uniqueDatesFromPicker(picker);
   const dates = formatDatesForSaving(unique);
@@ -142,7 +150,8 @@ function collectFormData() {
     division,
     mgmdSub,
     dates,
-    dateReleased,
+    leaveHours,   // ✅ now safe
+    dateReleased
   };
 }
 
@@ -154,6 +163,7 @@ function validateForm(d) {
     { key: "leaveType", label: "Type of Leave" },
     { key: "division", label: "Division" },
     { key: "dates", label: "Dates" },
+    { key: "leaveHours", label: "Leave Hours" },
     { key: "dateReleased", label: "Date Created" }
   ];
   const missing = requiredFields.filter(f => !d[f.key] || d[f.key].length === 0);
@@ -175,6 +185,7 @@ saveBtn.addEventListener("click", async () => {
   // ===== 1. COLLECT DATA =====
   const data = collectFormData();
   const validation = validateForm(data);
+ 
  
   if (!validation.isValid) {
     alert("Please fill: " + validation.missing.map(f => f.label).join(", "));
@@ -421,6 +432,7 @@ async function handleSuccessfulSave() {
   if (okBtn) {
     okBtn.style.display = "inline-block";
     okBtn.disabled = false;
+    clearLeaveHours();
   }
 }
 
@@ -542,8 +554,9 @@ tr.innerHTML = `
     <td>${d["TYPE OF LEAVE"] || "-"}</td>
     <td>${d["DIVISION"] || "-"}</td>
     <td>${displayLeaveDates}</td> 
-    <td>${displayCreated}</td>   
-    <td style="text-align: left; line-height: 1.4; vertical-align: top;">${displayRemarks}</td> 
+<td>${d["LEAVE HOURS"] || "-"}</td>
+<td>${displayCreated}</td>   
+<td style="text-align: left; line-height: 1.4; vertical-align: top;">${displayRemarks}</td> 
     <td>${btnHtml}</td>
 `;
     tableBody.appendChild(tr);
@@ -566,7 +579,7 @@ async function handleSubmit(sheetRowIndex, event) {
   const btn = event.target;
   const actionType = btn.innerText.trim().toUpperCase();
   const row = btn.closest("tr");
-  const remarksCell = row.cells[7];
+  const remarksCell = row.cells[8];
 
   const now = new Date();
 
@@ -688,6 +701,7 @@ function clearForm() {
   ["client", "GENDER", "TYPEOFDOCUMENT", "document", "division", "mgmd-sub", "dateReleased"].forEach(id => {
     const el = document.getElementById(id);
     if(el) el.value = "";
+    clearLeaveHours(); 
     
   });
   if(illnessInput) illnessInput.disabled = true; // Reset disabled state
@@ -1003,6 +1017,7 @@ const cancelBtn = document.getElementById("cancelBtn");
 cancelBtn.addEventListener("click", () => {
     // 1. Reset the Edit Mode tracker
     currentEditRowIndex = null;
+    clearLeaveHours(); // ✅ ADD
     
 
     // 2. Revert the Save Button UI
@@ -1037,10 +1052,10 @@ cancelBtn.addEventListener("click", () => {
 if (cancelBtn) {
   cancelBtn.addEventListener("click", (e) => {
     e.preventDefault(); // Stop the page from refreshing
-
+    clearLeaveHours(); // ✅ ADD
 
     if (!confirm("Clear all fields?")) return;
-
+clearLeaveHours(); // ✅ ADD
     // 1. Reset Text Inputs
     const textFields = ["client", "division", "dateReleased", "document", "mgmd-sub", "GENDER", "TYPEOFDOCUMENT"];
     textFields.forEach(id => {
@@ -1182,6 +1197,7 @@ function fillFormForEdit(data) {
     document.getElementById("client").value = data["EMPLOYEE NAME"] || data["EMPLOYEE NAME "] || "";
     document.getElementById("GENDER").value = data["GENDER"] || "";
     document.getElementById("division").value = data["DIVISION"] || "";
+    document.getElementById("leavehours").value = data["LEAVE HOURS"] || "";
     document.getElementById("remarks").value = data["REMARKS"] || "";
     const remarks = (data["REMARKS"] || "").toUpperCase();
 
@@ -1259,6 +1275,7 @@ if (cancelEditBtn) cancelEditBtn.style.display = "inline-block";
   document.getElementById("client").value = data["EMPLOYEE NAME"] || data["EMPLOYEE NAME "] || "";
   document.getElementById("GENDER").value = data["GENDER"] || "";
   document.getElementById("division").value = data["DIVISION"] || "";
+  document.getElementById("leavehours").value = data["LEAVE HOURS"] || "";
 
   // Leave type / sick leave
   const typeDropdown = document.getElementById("TYPEOFDOCUMENT");
@@ -1501,6 +1518,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   ]);
 
 });
+
+
+
+
+
+
+function clearLeaveHours() {
+  const leave = document.getElementById("leavehours");
+  if (leave) leave.value = "";
+}
 
 
 
