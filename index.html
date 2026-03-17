@@ -204,213 +204,186 @@
 
 <script>
   clearAllFields();
-document.addEventListener("DOMContentLoaded", () => {
 
-  const cancelEditBtn = document.getElementById("cancelEditBtn");
+  document.addEventListener("DOMContentLoaded", () => {
+    const cancelEditBtn = document.getElementById("cancelEditBtn");
 
-  if (!cancelEditBtn) return;
+    if (!cancelEditBtn) return;
 
-  cancelEditBtn.addEventListener("click", async function (e) {
+    cancelEditBtn.addEventListener("click", async function (e) {
+      e.preventDefault();
 
-    
-    e.preventDefault(); // prevents any form behavior
+      if (currentEditRowIndex === null) {
+        alert("No record selected.");
+        return;
+      }
 
+      if (!confirm("Mark this record as CANCELLED?")) return;
+
+      const now = new Date();
+
+      const formattedDate = now.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric"
+      }).toUpperCase();
+
+      const formattedTime = now.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true
+      }).toUpperCase().replace(/\s+/g, "");
+
+      const cancelHTML =
+        `<span style="background:#d3d3d3;color:black;font-weight:bold;padding:2px 6px;border-radius:3px;">CANCELLED</span> - ${formattedDate} - ${formattedTime}`;
+
+      const rows = document.querySelectorAll("#dataGrid tbody tr");
+      const row = rows[currentEditRowIndex - 2];
+
+      if (!row) {
+        alert("Row not found.");
+        return;
+      }
+
+      // ✅ CORRECT COLUMNS
+      const remarksCell = row.cells[8];
+      const actionCell = row.cells[9];
+
+      let existingRemarks = remarksCell.innerHTML.trim();
+
+      existingRemarks = existingRemarks.replace(/(<br>\s*)+$/g, "").trim();
+
+      if (existingRemarks.toUpperCase().includes("CANCELLED")) {
+        document.getElementById("modalMessage").innerText = "This record is already CANCELLED.";
+        document.getElementById("modalNotification").style.display = "flex";
+        return;
+      }
+
+      const finalRemarks = existingRemarks
+        ? existingRemarks + "<br>" + cancelHTML
+        : cancelHTML;
+
+      try {
+        await fetch(googleSheetsUrl, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "text/plain" },
+          body: JSON.stringify({
+            rowToUpdate: currentEditRowIndex,
+            action: "CANCEL",
+            dateStamp: finalRemarks,
+            isUpdateOnly: true
+          })
+        });
+
+        // ✅ preserve previous remarks
+        remarksCell.innerHTML = finalRemarks;
+
+        document.getElementById("modalMessage").innerText = "Record Cancelled";
+        document.getElementById("modalNotification").style.display = "flex";
+
+        actionCell.innerHTML = `
+          <button disabled style="
+            background:#d3d3d3;
+            color:black;
+            font-weight:bold;
+            border:none;
+            padding:6px 10px;
+            border-radius:4px;
+          ">
+            CANCELLED
+          </button>
+        `;
+
+        row.style.opacity = "0.6";
+
+        currentEditRowIndex = null;
+
+        const deleteBtn = document.getElementById("deleteBtn");
+        if (deleteBtn) deleteBtn.style.display = "none";
+        clearLeaveHours();
+
+        cancelEditBtn.style.display = "none";
+
+        if (typeof saveBtn !== "undefined") {
+          saveBtn.innerText = "SAVE DATA";
+          saveBtn.style.backgroundColor = "";
+        }
+
+      } catch (error) {
+        console.error("Cancel failed:", error);
+        alert("Cancel failed.");
+      }
+    });
+  });
+
+  function clearAllFields() {
+    document.getElementById("client").value = "";
+    document.getElementById("GENDER").value = "";
+    document.getElementById("TYPEOFDOCUMENT").value = "";
+    document.getElementById("document").value = "";
+    document.getElementById("division").value = "";
+    document.getElementById("remarks").value = "";
+    document.getElementById("leavehours").value = "";
+    document.getElementById("dateReleased").value = "";
+
+    if (typeof picker !== "undefined" && picker) {
+      picker.clear();
+    }
+  }
+
+  document.getElementById("deleteBtn").addEventListener("click", async function () {
     if (currentEditRowIndex === null) {
-      alert("No record selected.");
+      alert("No record selected to delete.");
       return;
     }
 
-    if (!confirm("Mark this record as CANCELLED?")) return;
+    if (!confirm("Are you sure you want to permanently delete this record?")) return;
 
-    const now = new Date();
+    clearLeaveHours();
 
-    const formattedDate = now.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric"
-    }).toUpperCase();
-
- const cancelHTML =
-`<span style="background:#d3d3d3;color:black;font-weight:bold;padding:2px 6px;border-radius:3px;">CANCELLED</span> - ${formattedDate}`;
-
-
-
-
-
-    const rows = document.querySelectorAll("#dataGrid tbody tr");
-    const row = rows[currentEditRowIndex - 2];
-
-    if (!row) {
-      alert("Row not found.");
-      return;
-    }
-
-    const remarksCell = row.cells[7];
-    const actionCell = row.cells[8];
-
-    const existingRemarks = remarksCell.innerHTML
-  .replace(/(<br>\s*)+$/g, "")
-  .trim();
-
-// 🚫 PREVENT DOUBLE CANCEL
-if (existingRemarks.toUpperCase().includes("CANCELLED")) {
-
-  document.getElementById("modalMessage").innerText = "This record is already CANCELLED.";
-  document.getElementById("modalNotification").style.display = "flex";
-
-  return; // stop execution
-}
-
-const finalRemarks = existingRemarks
-  ? existingRemarks + "<br>" + cancelHTML
-  : cancelHTML;
     try {
-
       await fetch(googleSheetsUrl, {
-  method: "POST",
-  mode: "no-cors",
-  headers: { "Content-Type": "text/plain" },
-  body: JSON.stringify({
-    rowToUpdate: currentEditRowIndex,
-    action: "CANCEL",
-    dateStamp: finalRemarks,
-    isUpdateOnly: true
-  })
-});
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify({
+          action: "DELETE",
+          rowIndex: currentEditRowIndex
+        })
+      });
 
-      // Update UI only (does not touch form panel)
-      remarksCell.innerHTML = finalRemarks;
+      const rows = document.querySelectorAll("#dataGrid tbody tr");
+      const row = rows[currentEditRowIndex - 2];
 
-      document.getElementById("modalMessage").innerText = "Record Cancelled";
-document.getElementById("modalNotification").style.display = "flex";
+      if (row) {
+        row.remove();
+      }
 
-      actionCell.innerHTML = `
-        <button disabled style="
-          background:#d3d3d3;
-          color:black;
-          font-weight:bold;
-          border:none;
-          padding:6px 10px;
-          border-radius:4px;
-        ">
-          CANCELLED
-        </button>
-      `;
+      alert("Record deleted successfully.");
 
-      row.style.opacity = "0.6";
-
-      // Exit edit mode safely
       currentEditRowIndex = null;
 
       const deleteBtn = document.getElementById("deleteBtn");
+      const cancelEditBtn = document.getElementById("cancelEditBtn");
+
       if (deleteBtn) deleteBtn.style.display = "none";
-      clearLeaveHours(); // ✅ ADD
+      if (cancelEditBtn) cancelEditBtn.style.display = "none";
 
-      cancelEditBtn.style.display = "none";
-
-      if (typeof saveBtn !== "undefined") {
-        saveBtn.innerText = "SAVE DATA";
-        saveBtn.style.backgroundColor = "";
-
+      if (typeof resetFormAfterSave === "function") {
+        resetFormAfterSave();
       }
 
-    } catch (error) {
-      console.error("Cancel failed:", error);
-      alert("Cancel failed.");
-    }
+      if (typeof loadDataFromSheet === "function") {
+        setTimeout(loadDataFromSheet, 800);
+      }
 
+    } catch (err) {
+      console.error("Delete failed:", err);
+      alert("Delete failed.");
+    }
   });
-
-});
-
-
-
-
-function clearAllFields() {
-
-  // text inputsf
-  document.getElementById("client").value = "";
-  document.getElementById("GENDER").value = "";
-  document.getElementById("TYPEOFDOCUMENT").value = "";
-  document.getElementById("document").value = "";
-  document.getElementById("division").value = "";
-  document.getElementById("remarks").value = "";
-  document.getElementById("leavehours").value = "";
-
-  // datetime picker
-  document.getElementById("dateReleased").value = "";
-
-  // flatpickr multi date
-  if (typeof picker !== "undefined" && picker) {
-    picker.clear();
-  }
-
-}
-
-
-
-document.getElementById("deleteBtn").addEventListener("click", async function () {
-
-  if (currentEditRowIndex === null) {
-    alert("No record selected to delete.");
-    return;
-  }
-
-  if (!confirm("Are you sure you want to permanently delete this record?")) return;
-   clearLeaveHours(); // ✅ ADD
-  try {
-
-    await fetch(googleSheetsUrl, {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "text/plain" },
-      body: JSON.stringify({
-        action: "DELETE",
-        rowIndex: currentEditRowIndex
-        
-      })
-    });
-
-    // Remove row visually from table
-    const rows = document.querySelectorAll("#dataGrid tbody tr");
-    const row = rows[currentEditRowIndex - 2];
-
-    if (row) {
-      row.remove();
-    }
-
-    alert("Record deleted successfully.");
-
-    // reset edit mode
-    currentEditRowIndex = null;
-
-    const deleteBtn = document.getElementById("deleteBtn");
-    const cancelEditBtn = document.getElementById("cancelEditBtn");
-
-    if (deleteBtn) deleteBtn.style.display = "none";
-    if (cancelEditBtn) cancelEditBtn.style.display = "none";
-
-    if (typeof resetFormAfterSave === "function") {
-      resetFormAfterSave();
-    }
-
-    if (typeof loadDataFromSheet === "function") {
-      setTimeout(loadDataFromSheet, 800);
-    }
-
-  } catch (err) {
-
-    console.error("Delete failed:", err);
-    alert("Delete failed.");
-
-  }
-
-});
-
-
-
-
-</script>  
+</script>
 
   
 
