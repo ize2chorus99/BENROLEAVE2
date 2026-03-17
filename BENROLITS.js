@@ -1,5 +1,5 @@
 // ===== CONFIG =====
-const googleSheetsUrl = "https://script.google.com/macros/s/AKfycbz6xSCQHalQad9wDtf2kcfs_S51HUlkrTrCHFsZW5XLV0n6ZbDdtStEBt3XDNa-Rk8h/exec";
+const googleSheetsUrl = "https://script.google.com/macros/s/AKfycbwpNM-j20xXFS-N3a-JtZXhFSfy1h7OICg-VZsK_8JP8FHuwj6Me_gHpTDeN8qSVRE/exec";
 const employeeListUrl = "https://script.google.com/macros/s/AKfycbz45A4WQebeP0l1HXGmb-372xqnJI_PzSAsnBrdPT__CEolhzerDVDrM5gTRNmSpe-c/exec";
 
 
@@ -219,7 +219,8 @@ saveBtn.addEventListener("click", async () => {
       const existingDates = parseAndDedupeDateString(rawDates)
   .map(d => dateKey(d));
 
-      const overlap = selectedDates.filter(d => existingDates.includes(d));
+    const existingSet = new Set(existingDates);
+const overlap = selectedDates.filter(d => existingSet.has(d));
 
       if (overlap.length > 0) {
 
@@ -481,8 +482,11 @@ let displayLeaveDates = rawLeaveDates;
 if (rawLeaveDates && rawLeaveDates !== "-") {
   const uniqueDates = parseAndDedupeDateString(rawLeaveDates);
   if (uniqueDates.length) {
-    displayLeaveDates = formatDatesForSaving(uniqueDates);
-  }
+   displayLeaveDates = formatDatesForSaving(uniqueDates)
+  .split(/,\s(?=[A-Z]{3}\s\d{1,2},)/)
+  .map(d => `<span class="date-tag">${d}</span>`)
+  .join(" ");
+}
 }
 
     let rawDateCreated = d["DATE CREATED"] || "-";
@@ -742,7 +746,7 @@ async function fetchData() {
 
 
 // Your existing timer
-setInterval(fetchData, 15000);
+setInterval(fetchData, 60000);
 
 
 
@@ -760,7 +764,8 @@ function filterTable() {
     } else {
         isManualSearchPaused = true;
     }
-   isManualSearchPaused = true;
+
+    isManualSearchPaused = true;
    
     const rows = Array.from(tableBody.rows);
     isSearching = searchValue.length > 0;
@@ -769,88 +774,144 @@ function filterTable() {
 
     // Column Mapping
     const COL = {
-        NAME: 1,      // Added for highlighting name
+        NAME: 1,
         TYPE: 3,      
         DIVISION: 4,  
         DATES: 5,     
         RELEASED: 6,  
         RECEIVED: 7,
-        ACTION: 8     // Set this to your actual Action Column index
+        ACTION: 8
     };
 
     // Helper function to apply yellow highlight
     const highlightCell = (cell, textToHighlight) => {
-        if (!cell || !textToHighlight || textToHighlight.length < 2) return;
-        
-        // 1. PROTECT: Skip cells with buttons or specific protected classes
-        if (cell.querySelector('button') || cell.classList.contains('action-column') || cell.classList.contains('remarks-column')) return;
 
-        const innerHTML = cell.innerText;
+        if (!cell || !textToHighlight || textToHighlight.length < 2) return;
+
+        // protect special cells
+if (
+    cell.querySelector('button') ||
+    cell.querySelector('.date-tag') ||   // ⭐ prevents breaking leave tags
+    cell.classList.contains('action-column') ||
+    cell.classList.contains('remarks-column')
+) return;
+
+        const innerHTML = cell.textContent;
+
         const escapedTerm = textToHighlight.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
         const regex = new RegExp(`(${escapedTerm})`, 'gi');
-        
-        // Use mark to highlight while preserving text
+
         cell.innerHTML = innerHTML.replace(regex, '<mark style="background-color: yellow; color: black; padding: 0 2px; border-radius: 2px;">$1</mark>');
     };
 
     // Helper to clear highlights WITHOUT breaking buttons or alignment
-   const clearHighlights = (row) => {
-  Array.from(row.cells).forEach((cell, idx) => {
+    const clearHighlights = (row) => {
 
-    // DO NOT TOUCH EMPLOYEE NAME COLUMN (index 1)
-    if (idx !== COL.ACTION && idx !== COL.RECEIVED && idx !== COL.NAME) {
-      cell.innerHTML = cell.innerText;
-    }
+        Array.from(row.cells).forEach((cell, idx) => {
 
-  });
-};
+            if (idx !== COL.ACTION && idx !== COL.RECEIVED && idx !== COL.NAME) {
+                if (!cell.querySelector(".date-tag")) {
+                     cell.innerHTML = cell.textContent;
+                }
+            }
+
+        });
+    };
 
     rows.forEach(row => {
-        clearHighlights(row); 
+
+        clearHighlights(row);
+
         let isMatch = false;
-        let targetCols = []; 
+        let targetCols = [];
+
+        // Cache row text once (FASTER)
+        const rowText = row.textContent.toUpperCase();
 
         // 1. DATE CREATED / SUBMITTED
         if (searchValue.startsWith("DATE CREATED") || searchValue.startsWith("SUBMITTED")) {
+
             const val = searchValue.replace(/DATE CREATED|SUBMITTED/, "").trim();
-            isMatch = row.cells[COL.RELEASED]?.innerText.toUpperCase().includes(val);
+
+            const cellText = row.cells[COL.RELEASED]?.textContent.toUpperCase() || "";
+
+            isMatch = cellText.includes(val);
+
             if (isMatch) targetCols.push({ idx: COL.RELEASED, val: val });
-        } 
+
+        }
+
         // 2. RECEIVED
         else if (searchValue.startsWith("RECEIVED")) {
+
             const val = searchValue.replace("RECEIVED", "").trim();
-            isMatch = row.cells[COL.RECEIVED]?.innerText.toUpperCase().includes(val);
+
+            const cellText = row.cells[COL.RECEIVED]?.textContent.toUpperCase() || "";
+
+            isMatch = cellText.includes(val);
+
             if (isMatch) targetCols.push({ idx: COL.RECEIVED, val: val });
+
         }
+
         // 3. DATE(S) LEAVE
         else if (searchValue.startsWith("DATE(S) LEAVE") || searchValue.startsWith("DATES LEAVE")) {
+
             const val = searchValue.replace(/DATE\(S\) LEAVE|DATES LEAVE/, "").trim();
-            isMatch = row.cells[COL.DATES]?.innerText.toUpperCase().includes(val);
+
+            const cellText = row.cells[COL.DATES]?.textContent.toUpperCase() || "";
+
+            isMatch = cellText.includes(val);
+
             if (isMatch) targetCols.push({ idx: COL.DATES, val: val });
+
         }
+
         // 4. GOOGLE-STYLE MULTI-WORD SEARCH
         else {
-            const rowText = row.innerText.toUpperCase();
+
             const searchTerms = searchValue.split(/\s+/);
+
             isMatch = searchTerms.every(term => rowText.includes(term));
-            
+
             if (isMatch) {
+
                 searchTerms.forEach(term => {
-                    if (row.cells[COL.NAME]?.innerText.toUpperCase().includes(term)) targetCols.push({ idx: COL.NAME, val: term });
-                    if (row.cells[COL.DIVISION]?.innerText.toUpperCase().includes(term)) targetCols.push({ idx: COL.DIVISION, val: term });
-                    if (row.cells[COL.DATES]?.innerText.toUpperCase().includes(term)) targetCols.push({ idx: COL.DATES, val: term });
-                    if (row.cells[COL.TYPE]?.innerText.toUpperCase().includes(term)) targetCols.push({ idx: COL.TYPE, val: term });
-                    if (row.cells[COL.RELEASED]?.innerText.toUpperCase().includes(term)) targetCols.push({ idx: COL.RELEASED, val: term });
+
+                    if (row.cells[COL.NAME]?.textContent.toUpperCase().includes(term))
+                        targetCols.push({ idx: COL.NAME, val: term });
+
+                    if (row.cells[COL.DIVISION]?.textContent.toUpperCase().includes(term))
+                        targetCols.push({ idx: COL.DIVISION, val: term });
+
+                    if (row.cells[COL.DATES]?.textContent.toUpperCase().includes(term))
+                        targetCols.push({ idx: COL.DATES, val: term });
+
+                    if (row.cells[COL.TYPE]?.textContent.toUpperCase().includes(term))
+                        targetCols.push({ idx: COL.TYPE, val: term });
+
+                    if (row.cells[COL.RELEASED]?.textContent.toUpperCase().includes(term))
+                        targetCols.push({ idx: COL.RELEASED, val: term });
+
                 });
+
             }
+
         }
 
         row.style.display = isMatch ? "" : "none";
+
         if (isMatch) {
+
             row.cells[0].innerText = visibleIndex++;
+
             targetCols.forEach(item => highlightCell(row.cells[item.idx], item.val));
+
         }
+
     });
+
 }
 
 // Keep your listeners the same
