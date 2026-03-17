@@ -8,7 +8,7 @@
    
 </head>
 <body>
-
+ 
   <div class="header">
     <img src="photos2/logopgb.png" alt="Logo" class="logo" />
 
@@ -67,7 +67,6 @@
 
   <datalist id="TYPEOFDOCUMENT_LIST">
     <option value="VACATION LEAVE">
-    <option value="COMPENSATORY LEAVE">
     <option value="MANDATORY/FORCED LEAVE">
     <option value="SICK LEAVE">
     <option value="MATERNITY LEAVE">
@@ -133,8 +132,7 @@
 
     <datalist id="divisionlist">
       <option value="AMD"></option>
-      <option value="NRMD"></option>
-       <option value="MGMDD OFFICE"></option>
+      <option value="MGMDD OFFICE"></option>
       <option value="MGMDD - NORTH DISTRICT - 1A (Lingion, Manolo Fortich)"></option>
       <option value="MGMDD - NORTH DISTRICT – 1B (San Vicente, Sumilao)"></option>
       <option value="MGMDD - NORTH DISTRICT - 1C (Pualas, Baungon)"></option>
@@ -175,7 +173,7 @@
   <button class="btn cancel" id="cancelBtn">CLEAR</button>
 
 <button id="deleteBtn" class="btn delete" style="display:none;">DELETE</button>
-<button id="cancelEditBtn" class="btn cancel-edit" style="display:none;">CANCEL</button>
+<button id="cancelEditBtn" class="btn cancel-edit" style="display:none;">CANCEL LEAVE</button>
 
 <script>
   clearAllFields();
@@ -242,16 +240,16 @@ const finalRemarks = existingRemarks
     try {
 
       await fetch(googleSheetsUrl, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          rowToUpdate: currentEditRowIndex,
-          action: "CANCEL",
-          dateStamp: finalRemarks,
-          isUpdateOnly: true
-        })
-      });
+  method: "POST",
+  mode: "no-cors",
+  headers: { "Content-Type": "text/plain" },
+  body: JSON.stringify({
+    rowToUpdate: currentEditRowIndex,
+    action: "CANCEL",
+    dateStamp: finalRemarks,
+    isUpdateOnly: true
+  })
+});
 
       // Update UI only (does not touch form panel)
       remarksCell.innerHTML = finalRemarks;
@@ -301,7 +299,7 @@ document.getElementById("modalNotification").style.display = "flex";
 
 function clearAllFields() {
 
-  // text inputs
+  // text inputsf
   document.getElementById("client").value = "";
   document.getElementById("GENDER").value = "";
   document.getElementById("TYPEOFDOCUMENT").value = "";
@@ -318,6 +316,66 @@ function clearAllFields() {
   }
 
 }
+
+
+
+document.getElementById("deleteBtn").addEventListener("click", async function () {
+
+  if (currentEditRowIndex === null) {
+    alert("No record selected to delete.");
+    return;
+  }
+
+  if (!confirm("Are you sure you want to permanently delete this record?")) return;
+
+  try {
+
+    await fetch(googleSheetsUrl, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain" },
+      body: JSON.stringify({
+        action: "DELETE",
+        rowIndex: currentEditRowIndex
+      })
+    });
+
+    // Remove row visually from table
+    const rows = document.querySelectorAll("#dataGrid tbody tr");
+    const row = rows[currentEditRowIndex - 2];
+
+    if (row) {
+      row.remove();
+    }
+
+    alert("Record deleted successfully.");
+
+    // reset edit mode
+    currentEditRowIndex = null;
+
+    const deleteBtn = document.getElementById("deleteBtn");
+    const cancelEditBtn = document.getElementById("cancelEditBtn");
+
+    if (deleteBtn) deleteBtn.style.display = "none";
+    if (cancelEditBtn) cancelEditBtn.style.display = "none";
+
+    if (typeof resetFormAfterSave === "function") {
+      resetFormAfterSave();
+    }
+
+    if (typeof loadDataFromSheet === "function") {
+      setTimeout(loadDataFromSheet, 800);
+    }
+
+  } catch (err) {
+
+    console.error("Delete failed:", err);
+    alert("Delete failed.");
+
+  }
+
+});
+
 
 
 
@@ -521,9 +579,6 @@ Attempts: <span id="retryCount">0</span>
 
 </body>
 </html>
-
-
-
 
 
 
