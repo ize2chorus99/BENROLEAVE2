@@ -1363,20 +1363,46 @@ table td:last-child {
 
 
 #formPanel {
-  max-height: 200px; /* High enough to fit your form */
+  max-height: 260px;
   overflow: hidden;
-  transition: max-height 0.5s ease-in-out, opacity 0.5s ease, margin-buttom 0.5s ease;
+
   opacity: 1;
+  transform: translateY(0) scale(1);
+
+  padding-top: 15px;
+  padding-bottom: 15px;
+
+  transform-origin: top;
+
+  transition:
+    max-height 0.55s cubic-bezier(.25,.8,.25,1),
+    opacity 0.35s ease,
+    transform 0.35s ease,
+    padding 0.35s ease,
+    margin-bottom 0.35s ease;
+
+  will-change: transform, opacity;
 }
 
-/* State when hidden */
+/* Hidden state */
 #formPanel.hidden-panel {
   max-height: 0;
+
   opacity: 0;
-  margin-bottom: 0;
+
+  transform: translateY(-10px) scale(.98);
+
   padding-top: 0;
   padding-bottom: 0;
+
+  margin-bottom: 0;
+
   pointer-events: none;
+}
+
+
+.datatable {
+  transition: height 0.55s cubic-bezier(.25,.8,.25,1);
 }
 
 
@@ -1428,6 +1454,15 @@ table td:last-child {
   position: absolute;
   bottom: 6px;
   right: 50px;
+}
+
+
+#toggleBtn {
+  transition: transform 0.25s ease, background 0.25s ease;
+}
+
+#toggleBtn:hover {
+  transform: scale(1.05);
 }
 
 
@@ -1614,9 +1649,7 @@ table td:last-child {
 
 
 
-#deleteBtn {
-  display: none !important;
-}
+
 
 
 
@@ -1743,4 +1776,24 @@ margin:auto;
 
 body{
 overflow-x:auto;
+}
+
+
+.date-tag{
+  display:inline-block;
+  background:#110275;
+  color:white;
+  padding:3px 6px;
+  margin:2px;
+  border-radius:6px;
+  font-size:11px;
+  white-space:nowrap;
+}
+
+
+
+#dataGrid td:nth-child(6){
+  display: flex;
+  flex-wrap: wrap;     /* allow tags to go to next line */
+  gap: 4px;
 }
