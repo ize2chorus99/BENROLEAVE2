@@ -174,6 +174,19 @@ body {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 /*-------------------- TYPE OF DOCUMENT -------------------------*/
 
 
@@ -489,7 +502,7 @@ body {
   width: 290px;
 
   margin-top: -49px;
-  margin-left: 63.5%;
+  margin-left: 75%;
 
 }
 
@@ -676,6 +689,53 @@ body {
 #fileList button:hover {
   background-color: #b91c1c;
 }
+
+
+
+
+
+.floating-input-group15 input[type="text"] {
+  width: 36.5%;
+  height: 27px;
+  font-size: 25px;
+  padding: 18px 12px 6px 12px;
+
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  background-color: white;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.floating-input-group15 input[type="text"]:focus {
+  border-color: #78038d;
+}
+
+.floating-input-group15 label {
+  position: absolute;
+  left: 12px;
+  top: 14px;
+  color: #888;
+  background-color: white;
+  padding: 0 4px;
+  font-size: 20px;
+  pointer-events: none;
+  transition: 0.2s ease all;
+}
+
+.floating-input-group15 input:focus + label,
+.floating-input-group15 input:not(:placeholder-shown) + label {
+  top: -8px;
+  font-size: 14px;
+  color: #78038d;
+}
+
+.floating-input-group15 {
+  position: relative; /* Needed for label positioning */
+  margin-left: 55%;  /* Adjust left margin */
+  margin-top:  -52px;   /* Optional spacing between fields */
+}
+
 
 
 
@@ -1111,24 +1171,54 @@ table td:last-child {
 
 
 
-  .picker-container {
-  width: 381px;
-  margin-left: 435px;
+ .picker-container {
+  width: clamp(20px, 22vw, 300px);
+  margin-left: 32%;
   margin-top: -138px;
-  position: relative; /* make it a proper stacking context */
-  z-index: 2;        /* above overlapping elements */
+  position: relative;
+  z-index: 2;
 }
 
-
- .picker-container input {
+.picker-container input {
   width: 100%;
+  box-sizing: border-box;
   padding: 10px;
   font-size: 14px;
   border-radius: 8px;
-  height: 28px;
-  cursor: pointer;      /* shows it’s clickable */
-  position: relative;   /* ensure click area is correct */
-  z-index: 3;           /* above the container */
+  height: 48px;
+  cursor: pointer;
+  position: relative;
+  z-index: 3;
+}
+
+@media (max-width: 1200px) {
+  .picker-container {
+    margin-left: 25%;
+    margin-top: -130px;
+  }
+}
+
+@media (max-width: 992px) {
+  .picker-container {
+    width: clamp(200px, 26vw, 280px);
+    margin-left: 23%;
+    margin-top: -122px;
+  }
+}
+
+@media (max-width: 768px) {
+  .picker-container {
+    width: clamp(180px, 30vw, 240px);
+    margin-left: 20%;
+    margin-top: -115px;
+  }
+
+  .picker-container input {
+    height: 44px;
+    font-size: 13px;
+  }
+
+
 }
 
   .datelabel{
@@ -1755,24 +1845,11 @@ overflow-x:auto;
 
 
 
-html, body{
-    min-width:1400px;
-}
-
-.app-wrapper{
-    width:1600px;
-    margin:auto;
-}
-
 body{
     overflow-x:auto;
 }
 
 
-.app-wrapper{
-width:1528px;
-margin:auto;
-}
 
 body{
 overflow-x:auto;
