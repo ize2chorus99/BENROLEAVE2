@@ -1,6 +1,9 @@
-// ===== LOADER =====
+// ===== LOADER ELEMENTS =====
+const startupLoader = document.getElementById("startupLoader");
 const dataLoadingOverlay = document.getElementById("dataLoadingOverlay");
+const tableBody = document.querySelector("#dataGrid tbody");
 
+// ===== DATA LOADER =====
 function showDataLoader(message = "Loading data...") {
   if (!dataLoadingOverlay) return;
 
@@ -21,8 +24,53 @@ function hideDataLoader() {
   }, 300);
 }
 
-// ===== CHECK IF TABLE HAS DATA =====
+// ===== STARTUP LOADER =====
+function hideStartupLoader() {
+  if (!startupLoader) return;
 
+  startupLoader.classList.add("hide");
+
+  setTimeout(() => {
+    startupLoader.style.display = "none";
+  }, 300);
+}
+
+// ===== SIMPLE TABLE RENDER =====
+function renderTable(records) {
+  if (!tableBody) return;
+
+  tableBody.innerHTML = "";
+
+  if (!Array.isArray(records) || records.length === 0) {
+    tableBody.innerHTML = `
+      <tr>
+        <td colspan="10" style="text-align:center; padding:20px;">
+          No records found
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  records.forEach((row, i) => {
+    const tr = document.createElement("tr");
+
+    tr.innerHTML = `
+      <td>${i + 1}</td>
+      <td>${row["EMPLOYEE NAME"] || row["EMPLOYEE NAME "] || ""}</td>
+      <td>${row["GENDER"] || ""}</td>
+      <td>${row["TYPE OF LEAVE"] || ""}</td>
+      <td>${row["DIVISION"] || ""}</td>
+      <td>${row["DATES"] || ""}</td>
+      <td>${row["LEAVE HOURS"] || ""}</td>
+      <td>${row["DATE CREATED"] || row["DATE RELEASED"] || ""}</td>
+      <td>${row["REMARKS"] || ""}</td>
+      <td>${row["ACTIONS"] || ""}</td>
+    `;
+
+    tableBody.appendChild(tr);
+  });
+}
 
 // ===== LOAD DATA =====
 async function loadDataFromSheet(showLoader = true) {
@@ -42,6 +90,10 @@ async function loadDataFromSheet(showLoader = true) {
       cache: "no-store"
     });
 
+    if (!res.ok) {
+      throw new Error(`HTTP error: ${res.status}`);
+    }
+
     const data = await res.json();
 
     allRecords = Array.isArray(data)
@@ -51,47 +103,48 @@ async function loadDataFromSheet(showLoader = true) {
         }))
       : [];
 
-    // ✅ RENDER TABLE
     if (!isTransitioning) {
-      
+      renderTable(allRecords);
     }
 
-    // ✅ CLOSE LOADER AFTER RENDER
-    setTimeout(closeLoaderWhenGridHasData, 50);
-    setTimeout(closeLoaderWhenGridHasData, 200);
+    hideDataLoader();
+    hideStartupLoader();
 
   } catch (err) {
     console.error("Load error:", err);
     hideDataLoader();
+
+    if (tableBody) {
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="10" style="text-align:center; color:red; padding:20px;">
+            Failed to load data
+          </td>
+        </tr>
+      `;
+    }
+
+    // optional: also hide startup loader even on error
+    hideStartupLoader();
   }
 }
 
 // ===== STARTUP =====
 document.addEventListener("DOMContentLoaded", async () => {
-  showDataLoader("Loading data...");
-  await loadOfficialEmployees();
-  await loadDataFromSheet(true);
+  try {
+    showDataLoader("Loading data...");
+    await loadOfficialEmployees();
+    await loadDataFromSheet(true);
+  } catch (e) {
+    console.error(e);
+    hideDataLoader();
+    hideStartupLoader();
+  }
 });
 
-// ===== AUTO REFRESH (NO LOADER) =====
+// ===== AUTO REFRESH =====
 setInterval(() => {
   if (!isSearchActive && !isManualSearchPaused && !isUpdatingRecord && !isTransitioning) {
     loadDataFromSheet(false);
   }
 }, 15000);
-
-
-function closeStartupLoaderIfGridHasData() {
-  const loader = document.getElementById("startupLoader");
-  const rows = document.querySelectorAll("#dataGrid tbody tr");
-
-  if (!loader) return;
-
-  if (rows.length > 0) {
-    loader.classList.add("hide");
-
-    setTimeout(() => {
-      loader.style.display = "none";
-    }, 300);
-  }
-}
