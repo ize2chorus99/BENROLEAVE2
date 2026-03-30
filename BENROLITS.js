@@ -13,6 +13,9 @@ const deleteBtn = document.getElementById("deleteBtn");
 const cancelEditBtn = document.getElementById("cancelEditBtn");
 
 
+
+
+
 let currentEditRowIndex = null;
 
 let allRecords = [];
@@ -31,6 +34,7 @@ let internetModal;
 let retryCount;
 
 let lockedRowIndex = null;
+let isTransitioning = false;
 
 
 const searchInput = document.getElementById("searchBox");
@@ -464,7 +468,13 @@ allRecords = data.map((row, i) => ({
 
 
 
-renderTable(allRecords);
+if (!isTransitioning) {
+  renderTable(allRecords);
+}
+
+setTimeout(() => {
+      closeStartupLoaderIfGridHasData();
+    }, 100);
 
   } catch (err) {
     console.error("Load error:", err);
@@ -476,6 +486,7 @@ renderTable(allRecords);
 
 function renderTable(dataToDisplay) {
 
+   if (isTransitioning) return; 
   
   if(!tableBody) return;
   tableBody.innerHTML = ""; 
@@ -490,6 +501,9 @@ function renderTable(dataToDisplay) {
     // Existing date logic...
    let rawLeaveDates = d["DATES"] || "-";
 let displayLeaveDates = rawLeaveDates;
+
+
+
 
 if (rawLeaveDates && rawLeaveDates !== "-") {
   const uniqueDates = parseAndDedupeDateString(rawLeaveDates);
@@ -558,6 +572,9 @@ tr.innerHTML = `
 `;
     tableBody.appendChild(tr);
   });
+
+  
+
 }
 
 // Add this function to handle the click action
@@ -694,6 +711,7 @@ async function handleSubmit(sheetRowIndex, event) {
   }
 
  setTimeout(loadDataFromSheet, 1500);
+
 }
 
 function clearForm() {
@@ -735,9 +753,9 @@ async function fetchData() {
 
    
 
-    if (!isManualSearchPaused) {
-      renderTable(allRecords);
-    }
+  if (!isManualSearchPaused && !isTransitioning) {
+  renderTable(allRecords);
+}
 
   } catch (err) {
     console.error(err);
@@ -768,167 +786,139 @@ setInterval(fetchData, 60000);
 // 1. Reference the new Button and Search Box
 const searchBtn = document.getElementById("searchBtn");
 const searchBox = document.getElementById("searchBox");
+
+
+function resetTableView() {
+  isManualSearchPaused = false;
+  isSearchActive = false;
+
+  if (!isTransitioning) {
+    renderTable(allRecords);
+  }
+}
+
+
+
+
+
+
 function filterTable() {
+  const searchValue = searchBox.value.toUpperCase().trim();
 
-    const searchValue = searchBox.value.toUpperCase().trim();
+  // ✅ if search is empty, fully rebuild table so links/buttons work again
+  if (searchValue === "") {
+    resetTableView();
+    return;
+  }
 
-    if (searchValue === "") {
-        isManualSearchPaused = false;
-    } else {
-        isManualSearchPaused = true;
-    }
+  isManualSearchPaused = true;
+  isSearchActive = true;
 
-    isManualSearchPaused = true;
-   
-    const rows = Array.from(tableBody.rows);
-    isSearching = searchValue.length > 0;
+  const rows = Array.from(tableBody.rows);
+  let visibleIndex = 1;
 
-    let visibleIndex = 1;
+  const COL = {
+    NAME: 1,
+    TYPE: 3,
+    DIVISION: 4,
+    DATES: 5,
+    RELEASED: 7,   // DATE CREATED
+    RECEIVED: 8,   // REMARKS
+    ACTION: 9
+  };
 
-    // Column Mapping
-    const COL = {
-        NAME: 1,
-        TYPE: 3,      
-        DIVISION: 4,  
-        DATES: 5,     
-        RELEASED: 6,  
-        RECEIVED: 7,
-        ACTION: 8
-    };
+  function safeHighlight(cell, textToHighlight) {
+    if (!cell || !textToHighlight || textToHighlight.length < 2) return;
 
-    // Helper function to apply yellow highlight
-    const highlightCell = (cell, textToHighlight) => {
+    // ❌ do not touch hyperlink / button / remarks / action cells
+    if (
+      cell.querySelector("a") ||
+      cell.querySelector("button") ||
+      cell.querySelector(".date-tag") ||
+      cell.classList.contains("action-column") ||
+      cell.classList.contains("remarks-column")
+    ) return;
 
-        if (!cell || !textToHighlight || textToHighlight.length < 2) return;
+    const original = cell.textContent;
+    const escaped = textToHighlight.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const regex = new RegExp(`(${escaped})`, "gi");
 
-        // protect special cells
-if (
-    cell.querySelector('button') ||
-    cell.querySelector('.date-tag') ||   // ⭐ prevents breaking leave tags
-    cell.classList.contains('action-column') ||
-    cell.classList.contains('remarks-column')
-) return;
+    cell.innerHTML = original.replace(
+      regex,
+      '<mark style="background-color: yellow; color: black; padding: 0 2px; border-radius: 2px;">$1</mark>'
+    );
+  }
 
-        const innerHTML = cell.textContent;
+  rows.forEach(row => {
+    let isMatch = false;
+    let targetCols = [];
+    const rowText = row.textContent.toUpperCase();
 
-        const escapedTerm = textToHighlight.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
-        const regex = new RegExp(`(${escapedTerm})`, 'gi');
-
-        cell.innerHTML = innerHTML.replace(regex, '<mark style="background-color: yellow; color: black; padding: 0 2px; border-radius: 2px;">$1</mark>');
-    };
-
-    // Helper to clear highlights WITHOUT breaking buttons or alignment
-    const clearHighlights = (row) => {
-
-        Array.from(row.cells).forEach((cell, idx) => {
-
-            if (idx !== COL.ACTION && idx !== COL.RECEIVED && idx !== COL.NAME) {
-                if (!cell.querySelector(".date-tag")) {
-                     cell.innerHTML = cell.textContent;
-                }
-            }
-
-        });
-    };
-
-    rows.forEach(row => {
-
-        clearHighlights(row);
-
-        let isMatch = false;
-        let targetCols = [];
-
-        // Cache row text once (FASTER)
-        const rowText = row.textContent.toUpperCase();
-
-        // 1. DATE CREATED / SUBMITTED
-        if (searchValue.startsWith("DATE CREATED") || searchValue.startsWith("SUBMITTED")) {
-
-            const val = searchValue.replace(/DATE CREATED|SUBMITTED/, "").trim();
-
-            const cellText = row.cells[COL.RELEASED]?.textContent.toUpperCase() || "";
-
-            isMatch = cellText.includes(val);
-
-            if (isMatch) targetCols.push({ idx: COL.RELEASED, val: val });
-
-        }
-
-        // 2. RECEIVED
-        else if (searchValue.startsWith("RECEIVED")) {
-
-            const val = searchValue.replace("RECEIVED", "").trim();
-
-            const cellText = row.cells[COL.RECEIVED]?.textContent.toUpperCase() || "";
-
-            isMatch = cellText.includes(val);
-
-            if (isMatch) targetCols.push({ idx: COL.RECEIVED, val: val });
-
-        }
-
-        // 3. DATE(S) LEAVE
-        else if (searchValue.startsWith("DATE(S) LEAVE") || searchValue.startsWith("DATES LEAVE")) {
-
-            const val = searchValue.replace(/DATE\(S\) LEAVE|DATES LEAVE/, "").trim();
-
-            const cellText = row.cells[COL.DATES]?.textContent.toUpperCase() || "";
-
-            isMatch = cellText.includes(val);
-
-            if (isMatch) targetCols.push({ idx: COL.DATES, val: val });
-
-        }
-
-        // 4. GOOGLE-STYLE MULTI-WORD SEARCH
-        else {
-
-            const searchTerms = searchValue.split(/\s+/);
-
-            isMatch = searchTerms.every(term => rowText.includes(term));
-
-            if (isMatch) {
-
-                searchTerms.forEach(term => {
-
-                    if (row.cells[COL.NAME]?.textContent.toUpperCase().includes(term))
-                        targetCols.push({ idx: COL.NAME, val: term });
-
-                    if (row.cells[COL.DIVISION]?.textContent.toUpperCase().includes(term))
-                        targetCols.push({ idx: COL.DIVISION, val: term });
-
-                    if (row.cells[COL.DATES]?.textContent.toUpperCase().includes(term))
-                        targetCols.push({ idx: COL.DATES, val: term });
-
-                    if (row.cells[COL.TYPE]?.textContent.toUpperCase().includes(term))
-                        targetCols.push({ idx: COL.TYPE, val: term });
-
-                    if (row.cells[COL.RELEASED]?.textContent.toUpperCase().includes(term))
-                        targetCols.push({ idx: COL.RELEASED, val: term });
-
-                });
-
-            }
-
-        }
-
-        row.style.display = isMatch ? "" : "none";
-
-        if (isMatch) {
-
-            row.cells[0].innerText = visibleIndex++;
-
-            targetCols.forEach(item => highlightCell(row.cells[item.idx], item.val));
-
-        }
-
+    // remove old temporary highlights only from safe plain-text cells
+    [2, 3, 4, 6, 7].forEach(idx => {
+      const cell = row.cells[idx];
+      if (cell && !cell.querySelector("a") && !cell.querySelector("button") && !cell.querySelector(".date-tag")) {
+        cell.innerHTML = cell.textContent;
+      }
     });
 
+    if (searchValue.startsWith("DATE CREATED") || searchValue.startsWith("SUBMITTED")) {
+      const val = searchValue.replace(/DATE CREATED|SUBMITTED/, "").trim();
+      const cellText = row.cells[COL.RELEASED]?.textContent.toUpperCase() || "";
+      isMatch = cellText.includes(val);
+      if (isMatch) targetCols.push({ idx: COL.RELEASED, val });
+    }
+
+    else if (searchValue.startsWith("RECEIVED")) {
+      const val = searchValue.replace("RECEIVED", "").trim();
+      const cellText = row.cells[COL.RECEIVED]?.textContent.toUpperCase() || "";
+      isMatch = cellText.includes(val);
+      if (isMatch) targetCols.push({ idx: COL.RECEIVED, val });
+    }
+
+    else if (searchValue.startsWith("DATE(S) LEAVE") || searchValue.startsWith("DATES LEAVE")) {
+      const val = searchValue.replace(/DATE\(S\) LEAVE|DATES LEAVE/, "").trim();
+      const cellText = row.cells[COL.DATES]?.textContent.toUpperCase() || "";
+      isMatch = cellText.includes(val);
+      if (isMatch) targetCols.push({ idx: COL.DATES, val });
+    }
+
+    else {
+      const searchTerms = searchValue.split(/\s+/);
+      isMatch = searchTerms.every(term => rowText.includes(term));
+
+      if (isMatch) {
+        searchTerms.forEach(term => {
+          if (row.cells[COL.TYPE]?.textContent.toUpperCase().includes(term)) {
+            targetCols.push({ idx: COL.TYPE, val: term });
+          }
+          if (row.cells[COL.DIVISION]?.textContent.toUpperCase().includes(term)) {
+            targetCols.push({ idx: COL.DIVISION, val: term });
+          }
+          if (row.cells[COL.RELEASED]?.textContent.toUpperCase().includes(term)) {
+            targetCols.push({ idx: COL.RELEASED, val: term });
+          }
+        });
+      }
+    }
+
+    row.style.display = isMatch ? "" : "none";
+
+    if (isMatch) {
+      row.cells[0].innerText = visibleIndex++;
+      targetCols.forEach(item => safeHighlight(row.cells[item.idx], item.val));
+    }
+  });
 }
 
 // Keep your listeners the same
 searchBtn.addEventListener("click", filterTable);
+searchBox.addEventListener("input", () => {
+  if (searchBox.value.trim() === "") {
+    resetTableView();
+  }
+});
+
 
 searchBox.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
@@ -982,31 +972,73 @@ loadDataFromSheet();
 
 
 function togglePanel() {
+
   const panel = document.getElementById("formPanel");
   const dataTable = document.querySelector(".datatable"); 
   const btn = document.getElementById("toggleBtn");
   const printBtn = document.getElementById("printBtn");
 
-  panel.classList.toggle("hidden-panel");
+  if (isTransitioning) return;
+  isTransitioning = true;
 
-  if (panel.classList.contains("hidden-panel")) {
-    // FORM IS HIDDEN
-    btn.innerHTML = "Show Form";
-    dataTable.style.height = "450px"; 
-    dataTable.classList.add("hide-actions");
+  // 🧊 STEP 1: CREATE CLONE
+  const clone = dataTable.cloneNode(true);
+  const rect = dataTable.getBoundingClientRect();
 
-    // SHOW PRINT BUTTON
-    if (printBtn) printBtn.style.display = "inline-block";
+  clone.classList.add("table-clone");
+  clone.style.top = rect.top + "px";
+  clone.style.left = rect.left + "px";
+  clone.style.width = rect.width + "px";
 
-  } else {
-    // FORM IS SHOWN
-    btn.innerHTML = "Hide Form";
-    dataTable.style.height = "210px";
-    dataTable.classList.remove("hide-actions");
+  document.body.appendChild(clone);
 
-    // HIDE PRINT BUTTON
-    if (printBtn) printBtn.style.display = "none";
-  }
+  // 🧊 STEP 2: HIDE REAL TABLE (no repaint glitch)
+  dataTable.classList.add("hidden-real");
+
+  // 🧊 STEP 3: FORCE FRAME
+  requestAnimationFrame(() => {
+
+    // 🎬 STEP 4: ANIMATE CLONE OUT
+    clone.classList.add("fade-out");
+
+    setTimeout(() => {
+
+      // 🧱 STEP 5: CHANGE LAYOUT SAFELY
+      panel.classList.toggle("hidden-panel");
+
+      if (panel.classList.contains("hidden-panel")) {
+        btn.innerHTML = "Show Form";
+        dataTable.style.height = "450px";
+        dataTable.classList.add("hide-actions");
+
+        if (printBtn) printBtn.style.display = "inline-block";
+
+      } else {
+        btn.innerHTML = "Hide Form";
+        dataTable.style.height = "210px";
+        dataTable.classList.remove("hide-actions");
+
+        if (printBtn) printBtn.style.display = "none";
+      }
+
+      // 🧠 STEP 6: WAIT FOR LAYOUT STABLE
+      requestAnimationFrame(() => {
+
+        // 🧹 STEP 7: REMOVE CLONE
+        clone.remove();
+
+        // ✨ STEP 8: SHOW REAL TABLE CLEAN
+        dataTable.classList.remove("hidden-real");
+
+        // 🔓 UNLOCK + RELOAD DATA
+        isTransitioning = false;
+        loadDataFromSheet();
+
+      });
+
+    }, 450);
+
+  });
 }
 
 // ===== CANCEL BUTTON LOGIC =====
@@ -1557,8 +1589,20 @@ function clearLeaveHours() {
 
 
 
+function closeStartupLoaderIfGridHasData() {
+  const loader = document.getElementById("startupLoader");
+  const rows = document.querySelectorAll("#dataGrid tbody tr");
 
+  if (!loader) return;
 
+  if (rows.length > 0 || allRecords.length === 0) {
+    loader.classList.add("hide");
+
+    setTimeout(() => {
+      loader.style.display = "none";
+    }, 300);
+  }
+}
 
 
 
