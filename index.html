@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="BENROLITS.css" />
+    <link rel="stylesheet" href="startupload.css" />
     <title>BENRO - LITS</title>
    
 </head>
@@ -116,6 +117,8 @@
 
 
 
+
+
   
 
 
@@ -142,7 +145,6 @@
 
     <datalist id="divisionlist">
       <option value="AMD"></option>
-      <option value="NRMD"></option>
       <option value="MGMDD OFFICE"></option>
       <option value="MGMDD - NORTH DISTRICT - 1A (Lingion, Manolo Fortich)"></option>
       <option value="MGMDD - NORTH DISTRICT – 1B (San Vicente, Sumilao)"></option>
@@ -318,7 +320,44 @@
     });
   });
 
-  function clearAllFields() {
+ function clearAllFields() {
+  document.getElementById("client").value = "";
+  document.getElementById("GENDER").value = "";
+  document.getElementById("TYPEOFDOCUMENT").value = "";
+  document.getElementById("document").value = "";
+  document.getElementById("division").value = "";
+  document.getElementById("remarks").value = "";
+  document.getElementById("leavehours").value = "";
+  document.getElementById("dateReleased").value = "";
+
+  // clear flatpickr dates
+  if (typeof picker !== "undefined" && picker) {
+    picker.clear();
+  }
+
+  // reset sick leave field state
+  const illnessInput = document.getElementById("document");
+  const typeInput = document.getElementById("TYPEOFDOCUMENT");
+
+  if (illnessInput) {
+    illnessInput.disabled = true;
+    illnessInput.style.backgroundColor = "#f0f0f0";
+  }
+
+  if (typeInput) {
+    typeInput.value = "";
+  }
+
+  // reset edit mode
+  currentEditRowIndex = null;
+
+  // hide edit/delete buttons
+  const deleteBtn = document.getElementById("deleteBtn");
+  const cancelEditBtn = document.getElementById("cancelEditBtn");
+
+
+
+
     document.getElementById("client").value = "";
     document.getElementById("GENDER").value = "";
     document.getElementById("TYPEOFDOCUMENT").value = "";
@@ -384,6 +423,19 @@
       alert("Delete failed.");
     }
   });
+
+
+
+  document.addEventListener("DOMContentLoaded", () => {
+  const cancelBtn = document.getElementById("cancelBtn");
+
+  if (cancelBtn) {
+    cancelBtn.addEventListener("click", function (e) {
+      e.preventDefault(); // prevents weird behavior
+      clearAllFields();
+    });
+  }
+});
 </script>
 
   
@@ -581,6 +633,14 @@ Attempts: <span id="retryCount">0</span>
 </div>
 
 </div>
+
+<div id="startupLoader">
+  <div class="startup-loader-box">
+    <div class="startup-spinner"></div>
+    <div class="startup-loader-text">Loading data...</div>
+  </div>
+</div>
+
 
 
 </body>
