@@ -1,0 +1,60 @@
+
+
+/* ===== STARTUP LOADER ===== */
+#startupLoader {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.70);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 99999;
+
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.35s ease, visibility 0.35s ease;
+}
+
+#startupLoader.hide {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* ✅ PURPLE BOX (MERGED HERE) */
+.startup-loader-box {
+  background: #83009a; /* same purple as your header */
+  padding: 130px 140px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  min-width: 240px;
+}
+
+/* ===== SPINNER ===== */
+.startup-spinner {
+  width: 60px;
+  height: 60px;
+  border: 6px solid rgba(255,255,255,0.20);
+  border-top: 6px solid #ffffff;
+  border-radius: 50%;
+  animation: startupSpin 0.8s linear infinite;
+  margin: 0 auto;
+}
+
+/* ===== TEXT ===== */
+.startup-loader-text {
+  margin-top: 15px;
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+/* ===== ANIMATION ===== */
+@keyframes startupSpin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
