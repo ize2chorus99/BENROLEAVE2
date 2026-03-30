@@ -1737,8 +1737,78 @@ table td:last-child {
   cursor: pointer;
 }
 
+/* BASE STATE */
+#dataGrid tbody tr {
+  background-color: rgba(0,0,0,0);
+  opacity: 1;
+
+  transition:
+    background-color 0.35s ease,
+    transform 0.25s cubic-bezier(0.22,1,0.36,1),
+    box-shadow 0.25s cubic-bezier(0.22,1,0.36,1),
+    opacity 0.3s ease;
+
+  will-change: transform, opacity;
+}
+
+/* HOVER FADE IN */
+#dataGrid tbody tr:hover {
+  background-color: rgba(3, 141, 28, 0.08); /* soft green fade */
+  transform: translateY(-2px);
+
+  box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+}
 
 
+#dataGrid tbody tr td {
+  transition: color 0.25s ease, opacity 0.25s ease;
+}
+
+/* subtle highlight */
+#dataGrid tbody tr:hover td {
+  color: #000;
+}
+
+
+button {
+  transition:
+    background-color 0.25s ease,
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  opacity: 0.95;
+}
+
+
+.emp-link {
+  position: relative;
+  transition: color 0.25s ease;
+}
+
+.emp-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 2px;
+  background: #038d1c;
+
+  opacity: 0;
+  transform: scaleX(0.7);
+
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
+}
+
+.emp-link:hover::after {
+  opacity: 1;
+  transform: scaleX(1);
+}
 
 
 
@@ -1874,3 +1944,17 @@ overflow-x:auto;
   flex-wrap: wrap;     /* allow tags to go to next line */
   gap: 4px;
 }
+
+
+
+.datatable {
+  transition: opacity 0.3s ease;
+}
+
+.datatable.fading {
+  opacity: 0;
+}
+
+
+
+
