@@ -616,24 +616,32 @@ async function handleSubmit(sheetRowIndex, event) {
   const existingRemarks = remarksCell.innerHTML.trim();
 
   let htmlToSave = "";
+  let finalRemarks = "";
 
   if (actionType === "SUBMIT") {
     htmlToSave = `<span style="${submitStyle}">SUBMITTED</span> - ${formattedDate}`;
+    finalRemarks = htmlToSave;
   }
 
   else if (actionType === "RECEIVED") {
-    htmlToSave = existingRemarks
-      ? `${existingRemarks}<br><span style="${receiveStyle}">RECEIVED</span> - ${formattedDate}`
-      : `<span style="${receiveStyle}">RECEIVED</span> - ${formattedDate}`;
+    htmlToSave = `<span style="${receiveStyle}">RECEIVED</span> - ${formattedDate}`;
+    finalRemarks = existingRemarks
+      ? `${existingRemarks}<br>${htmlToSave}`
+      : htmlToSave;
   }
 
   else if (actionType === "CANCEL") {
 
-    if (existingRemarks.includes("CANCELLED")) return;
+    if (existingRemarks.includes("CANCELLED")) {
+      isUpdatingRecord = false;
+      lockedRowIndex = null;
+      return;
+    }
 
-    htmlToSave = existingRemarks
-      ? `${existingRemarks}<br><span style="${cancelStyle}">CANCELLED</span> - ${formattedDate} - ${formattedTime}`
-      : `<span style="${cancelStyle}">CANCELLED</span> - ${formattedDate} - ${formattedTime}`;
+    htmlToSave = `<span style="${cancelStyle}">CANCELLED</span> - ${formattedDate} - ${formattedTime}`;
+    finalRemarks = existingRemarks
+      ? `${existingRemarks}<br>${htmlToSave}`
+      : htmlToSave;
   }
 
   btn.disabled = true;
@@ -642,31 +650,29 @@ async function handleSubmit(sheetRowIndex, event) {
   try {
 
     await fetch(googleSheetsUrl, {
-  method: "POST",
-  mode: "no-cors",
-  headers: { "Content-Type": "text/plain" },
-  body: JSON.stringify({
-    rowToUpdate: sheetRowIndex,
-    action: actionType,
-    dateStamp: htmlToSave,
-    isUpdateOnly: true
-  })
-});
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain" },
+      body: JSON.stringify({
+        rowToUpdate: sheetRowIndex,
+        action: actionType,
+        dateStamp: finalRemarks,
+        isUpdateOnly: true
+      })
+    });
 
     // Update UI immediately
-    remarksCell.innerHTML = existingRemarks
-  ? existingRemarks + "<br>" + htmlToSave
-  : htmlToSave;
+    remarksCell.innerHTML = finalRemarks;
 
     const recordIndex = sheetRowIndex - 2;
     if (allRecords[recordIndex]) {
-      allRecords[recordIndex]["REMARKS"] = htmlToSave;
+      allRecords[recordIndex]["REMARKS"] = finalRemarks;
     }
 
     // Cancel logic
     if (actionType === "CANCEL") {
 
-      const actionCell = row.cells[8];
+      const actionCell = row.cells[9];
 
       actionCell.innerHTML = `
         <button class="cancelled-btn" disabled style="
@@ -702,15 +708,20 @@ async function handleSubmit(sheetRowIndex, event) {
       btn.disabled = true;
     }
 
+    isUpdatingRecord = false;
+    lockedRowIndex = null;
+
   } catch (error) {
 
     console.error("Error:", error);
     btn.disabled = false;
     btn.innerText = actionType;
+    isUpdatingRecord = false;
+    lockedRowIndex = null;
 
   }
 
- setTimeout(loadDataFromSheet, 1500);
+  setTimeout(loadDataFromSheet, 2500);
 
 }
 
