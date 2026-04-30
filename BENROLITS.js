@@ -721,7 +721,9 @@ async function handleSubmit(sheetRowIndex, event) {
 
   }
 
-  setTimeout(loadDataFromSheet, 2500);
+  setTimeout(() => {
+  loadDataFromSheet();
+}, 5000); // give server time
 
 }
 
@@ -1116,19 +1118,22 @@ CANCELLED
   try {
 
     await fetch(googleSheetsUrl, {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "text/plain" },
-      body: JSON.stringify({
-        rowToUpdate: currentEditRowIndex,
-        action: "CANCEL",
-        dateStamp: finalRemarks,
-        isUpdateOnly: true
-      })
-    });
+  method: "POST",
+  mode: "no-cors",
+  headers: { "Content-Type": "text/plain" },
+  body: JSON.stringify({
+    rowToUpdate: sheetRowIndex,
+    action: actionType,
+    dateStamp: finalRemarks,
+    isUpdateOnly: true
+  })
+});
 
-    // ✅ update UI without breaking history
-    remarksCell.innerHTML = finalRemarks;
+// 🔥 WAIT so Google Sheets finishes updating
+await new Promise(resolve => setTimeout(resolve, 1500));
+
+// ✅ THEN update UI
+remarksCell.innerHTML = finalRemarks;
 
     actionCell.innerHTML = `
       <button disabled style="
