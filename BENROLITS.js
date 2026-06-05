@@ -1,5 +1,5 @@
 // ===== CONFIG =====
-const googleSheetsUrl = "https://script.google.com/macros/s/AKfycbxAud1hQXdNVhSlDsh56QCp0pVH5t_R_BYxNsT3035dK5NjeYIrws1WhX-QARNQ9e1N/exec";
+const googleSheetsUrl = "https://script.google.com/macros/s/AKfycbw8vmyfJAMQqqmdG7LwzggYoZFSo9sqYcNgfzwsfTTsWZoWuGG4Ih6jt9YhUuia-61R/exec";
 const employeeListUrl = "https://script.google.com/macros/s/AKfycbz45A4WQebeP0l1HXGmb-372xqnJI_PzSAsnBrdPT__CEolhzerDVDrM5gTRNmSpe-c/exec";
 
 
@@ -11,6 +11,9 @@ const modalMessage = document.getElementById("modalMessage");
 const okBtn = document.getElementById("notificationOkBtn");
 const deleteBtn = document.getElementById("deleteBtn");
 const cancelEditBtn = document.getElementById("cancelEditBtn");
+const clearBtn = document.getElementById("clearBtn");
+
+
 
 
 
@@ -387,7 +390,7 @@ function showSavingModal(message) {
   if (checkmark) checkmark.style.opacity = 0;
 
   if (modalMessage) {
-    modalMessage.innerText = message || "Saving...";
+    modalMessage.innerText = message || "Processing...";
   }
 
   if (okBtn) {
@@ -446,33 +449,35 @@ const tableBody = document.querySelector("#dataGrid tbody");
 
 
 async function loadDataFromSheet() {
-  const searchInput = document.getElementById("searchInput");
+  const searchInput = document.getElementById("searchBox");
+
+  if (isUpdatingRecord) {
+    console.log("Skipped load: status update still saving.");
+    return;
+  }
 
   if (isSearchActive || (searchInput && searchInput.value.trim() !== "")) {
     console.log("Auto-refresh paused: Search results are locked.");
-    return; 
+    return;
   }
 
   try {
-    // 🔥 ADD TIMESTAMP TO PREVENT CACHE
-    const res = await fetch(`${googleSheetsUrl}?t=${new Date().getTime()}`, {
+    const res = await fetch(`${googleSheetsUrl}?t=${Date.now()}`, {
       cache: "no-store"
     });
 
- const data = await res.json();
+    const data = await res.json();
 
-allRecords = data.map((row, i) => ({
-  ...row,
-  rowIndex: i + 2
-}));
+    allRecords = data.map((row, i) => ({
+      ...row,
+      rowIndex: i + 2
+    }));
 
+    if (!isTransitioning) {
+      renderTable(allRecords);
+    }
 
-
-if (!isTransitioning) {
-  renderTable(allRecords);
-}
-
-setTimeout(() => {
+    setTimeout(() => {
       closeStartupLoaderIfGridHasData();
     }, 100);
 
@@ -543,12 +548,12 @@ else if (hasReceived) {
 }
 else if (hasSubmitted) {
   btnHtml = `
-    <button class="receive-btn" onclick="handleSubmit(${d.rowIndex}, event)">RECEIVED</button>
+    <button type="button" class="receive-btn" onclick="handleSubmit(${d.rowIndex}, event)">RECEIVED</button>
   `;
 }
 else {
   btnHtml = `
-    <button class="submit-btn" onclick="handleSubmit(${d.rowIndex}, event)">SUBMIT</button>
+    <button type="button" class="submit-btn" onclick="handleSubmit(${d.rowIndex}, event)">SUBMIT</button>
   `;
 }
     // --- UPDATED ROW HTML WITH CLICKABLE NAME ---
@@ -586,6 +591,12 @@ function handleEmployeeClick(name) {
 }
 
 async function handleSubmit(sheetRowIndex, event) {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  if (isUpdatingRecord) return;
 
   isUpdatingRecord = true;
   lockedRowIndex = sheetRowIndex;
@@ -593,7 +604,15 @@ async function handleSubmit(sheetRowIndex, event) {
   const btn = event.target;
   const actionType = btn.innerText.trim().toUpperCase();
   const row = btn.closest("tr");
+
+  if (!row) {
+    isUpdatingRecord = false;
+    lockedRowIndex = null;
+    return;
+  }
+
   const remarksCell = row.cells[8];
+  const actionCell = row.cells[9];
 
   const now = new Date();
 
@@ -613,8 +632,7 @@ async function handleSubmit(sheetRowIndex, event) {
   const receiveStyle = `background-color: green; color: white; font-weight: bold; padding: 2px 5px; border-radius: 3px;`;
   const cancelStyle = `background-color: #d3d3d3; color: black; font-weight: bold; padding: 2px 5px; border-radius: 3px;`;
 
-  const existingRemarks = remarksCell.innerHTML.trim();
-
+  let existingRemarks = remarksCell.innerHTML.trim();
   let htmlToSave = "";
   let finalRemarks = "";
 
@@ -624,6 +642,12 @@ async function handleSubmit(sheetRowIndex, event) {
   }
 
   else if (actionType === "RECEIVED") {
+    if (existingRemarks.toUpperCase().includes("RECEIVED")) {
+      isUpdatingRecord = false;
+      lockedRowIndex = null;
+      return;
+    }
+
     htmlToSave = `<span style="${receiveStyle}">RECEIVED</span> - ${formattedDate}`;
     finalRemarks = existingRemarks
       ? `${existingRemarks}<br>${htmlToSave}`
@@ -631,8 +655,7 @@ async function handleSubmit(sheetRowIndex, event) {
   }
 
   else if (actionType === "CANCEL") {
-
-    if (existingRemarks.includes("CANCELLED")) {
+    if (existingRemarks.toUpperCase().includes("CANCELLED")) {
       isUpdatingRecord = false;
       lockedRowIndex = null;
       return;
@@ -645,10 +668,9 @@ async function handleSubmit(sheetRowIndex, event) {
   }
 
   btn.disabled = true;
-  btn.innerText = "PROCESSING...";
+  btn.innerText = "SAVING...";
 
   try {
-
     await fetch(googleSheetsUrl, {
       method: "POST",
       mode: "no-cors",
@@ -661,7 +683,8 @@ async function handleSubmit(sheetRowIndex, event) {
       })
     });
 
-    // Update UI immediately
+    await new Promise(resolve => setTimeout(resolve, 1200));
+
     remarksCell.innerHTML = finalRemarks;
 
     const recordIndex = sheetRowIndex - 2;
@@ -669,62 +692,44 @@ async function handleSubmit(sheetRowIndex, event) {
       allRecords[recordIndex]["REMARKS"] = finalRemarks;
     }
 
-    // Cancel logic
-    if (actionType === "CANCEL") {
-
-      const actionCell = row.cells[9];
-
-      actionCell.innerHTML = `
-        <button class="cancelled-btn" disabled style="
-          background-color:#d3d3d3;
-          color:black;
-          font-weight:bold;
-          border:none;
-          padding:6px 10px;
-          border-radius:4px;">
-          CANCELLED
-        </button>
-      `;
-
-      row.style.opacity = "0.6";
-
-      isUpdatingRecord = false;
-      lockedRowIndex = null;
-
-      return;
-    }
-
-    // Button transition
     if (actionType === "SUBMIT") {
       btn.innerText = "RECEIVED";
       btn.className = "receive-btn";
       btn.disabled = false;
+      btn.setAttribute("type", "button");
       btn.onclick = (e) => handleSubmit(sheetRowIndex, e);
     }
 
-    else {
-      btn.innerText = "COMPLETED";
-      btn.className = "done-btn";
-      btn.disabled = true;
+    else if (actionType === "RECEIVED") {
+      actionCell.innerHTML = `
+        <button type="button" class="done-btn" disabled>COMPLETED</button>
+      `;
+    }
+
+    else if (actionType === "CANCEL") {
+      actionCell.innerHTML = `
+        <button type="button" class="done-btn" disabled>CANCELLED</button>
+      `;
+      row.style.opacity = "0.6";
     }
 
     isUpdatingRecord = false;
     lockedRowIndex = null;
 
-  } catch (error) {
+    // ✅ removed automatic loadDataFromSheet() here
+    // This prevents the table from visually refreshing after submit/receive.
 
-    console.error("Error:", error);
+  } catch (error) {
+    console.error("Status update failed:", error);
+
     btn.disabled = false;
     btn.innerText = actionType;
+
     isUpdatingRecord = false;
     lockedRowIndex = null;
 
+    alert("Status update failed. Please try again.");
   }
-
-  setTimeout(() => {
-  loadDataFromSheet();
-}, 5000); // give server time
-
 }
 
 function clearForm() {
@@ -741,39 +746,38 @@ function clearForm() {
 // Check every 15 seconds: Only refresh if box is empty AND not manually paused
 async function fetchData() {
 
-  if (isUpdatingRecord) return;
+  // ✅ do not refresh while submit/received is saving
+  if (isUpdatingRecord || lockedRowIndex !== null) {
+    console.log("⛔ Auto-refresh skipped: updating record");
+    return;
+  }
+
+  // ✅ do not refresh while searching
+  if (isManualSearchPaused || isSearchActive) {
+    console.log("⛔ Auto-refresh skipped: search active");
+    return;
+  }
 
   try {
-
     const response = await fetch(`${googleSheetsUrl}?t=${Date.now()}`, {
       cache: "no-store"
     });
 
     const data = await response.json();
 
-    // Do not overwrite row currently updating
-    if (lockedRowIndex !== null) {
+    // ✅ VERY IMPORTANT: add rowIndex again
+    allRecords = data.map((row, i) => ({
+      ...row,
+      rowIndex: i + 2
+    }));
 
-      const row = lockedRowIndex - 2;
-
-      if (allRecords[row]) {
-        data[row]["REMARKS"] = allRecords[row]["REMARKS"];
-      }
-
+    if (!isTransitioning) {
+      renderTable(allRecords);
     }
 
-    allRecords = data;
-
-   
-
-  if (!isManualSearchPaused && !isTransitioning) {
-  renderTable(allRecords);
-}
-
   } catch (err) {
-    console.error(err);
+    console.error("Fetch data error:", err);
   }
-
 }
 
 
@@ -1622,8 +1626,30 @@ function closeStartupLoaderIfGridHasData() {
 
 
 
+if (clearBtn) {
+  clearBtn.addEventListener("click", function (e) {
+    e.preventDefault();
 
+    // ✅ clear all form fields
+    resetFormAfterSave();
 
+    // ✅ make sure edit mode is fully removed
+    currentEditRowIndex = null;
 
+    // ✅ hide DELETE and CANCEL LEAVE buttons
+    if (deleteBtn) deleteBtn.style.display = "none";
+    if (cancelEditBtn) cancelEditBtn.style.display = "none";
+
+    // ✅ show SAVE DATA button
+    if (saveBtn) {
+      saveBtn.style.display = "inline-block";
+      saveBtn.innerText = "SAVE DATA";
+      saveBtn.style.backgroundColor = "";
+    }
+
+    // ✅ keep CLEAR button visible
+    clearBtn.style.display = "inline-block";
+  });
+}
 
 
